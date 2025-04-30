@@ -1,0 +1,11 @@
+openQAOAvenv
+IBMQvenv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+*.whl
+*.log
