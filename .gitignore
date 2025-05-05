@@ -1,7 +1,7 @@
 openQAOAvenv
 IBMQvenv
 IBMQpynbvenv
-openQAOAQASMenv
+IBMQvenv2
 __pycache__/
 *.pyc
 *.pyo

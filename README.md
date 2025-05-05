@@ -1,5 +1,4 @@
 # QAOAstudygit
 repo for QAOA study the second
 
-Current goals are to get a script where we can simulate the optimsation of the QAOA and submit the optmisied circuit to IBMQ for a QPU execution
-Other goal is to try and get the unoptmisied circuit but with the correct parameters out of the oepnQAOA script and into the IBMQ script
+currently able to simulate optimsation for specific IBMQ backend, and able to get the circuit out of open qaoa into ibmq simulator. Remaining issue is getting the parameters given by the openQAOA to the local IBMQ simulator. Doing this would make tweaking the QAOA approach easier but perhaps not completley necessary.
