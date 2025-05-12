@@ -7,6 +7,7 @@ chosen problem type (mac cut or bin packing) > openQAOAQUBOGenerator.ipynb > qub
 Issues are that it doesnt seem to give the correct/expected results. The reasons i can think of:
 > Formulation of cost hamiltoniain is slightly wrong (can test this by using a perfect simulator)
 > initial parameters for the QAOA are poor
+> not enough layers are being applied (potentially too many layers if noise is creeping in but theres only 2 so hopefully not or were doomed)
 > plotting script has some bug so bitstrings arent displayed properly (can also test this with simulator)
 > noise in qunatum circuit is just messing up results (less likely since it doesnt seem to be a completely uniform distribution across bit sterings, but again, can test with simulators)
 
