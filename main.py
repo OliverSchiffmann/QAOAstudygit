@@ -128,14 +128,22 @@ if __name__ == "__main__":
         load_qubo_and_build_hamiltonian(file_name, instanceIndex)
     )
 
-    output_filename = f"Optimised_Params_{problem_type}_{num_qubits}q.txt"
-
     circuit = QAOAAnsatz(cost_operator=cost_hamiltonian, reps=reps_p)
     circuit.measure_all()
 
     backend_simulator = AerSimulator()  # Ideal simulator
     # backend_simulator = AerSimulator.from_backend(FakeBrisbane()) # Simulator with IBM_Brisbane specific noise model
     # backend_simulator = AerSimulator.from_backend(FakeSherbrooke()) # Simulator with IBM_Sherbroke specific noise model
+
+    if "fake" in backend_simulator.name.lower():
+        simulator_name_for_file = (
+            backend_simulator.name.split("(")[1].lower().replace(")", "")
+        )  # e.g., "fakebrisbane"
+    else:
+        simulator_name_for_file = "aer_simulator_ideal"
+
+    output_filename = f"Optimised_Params_{problem_type}_{num_qubits}q_on_{simulator_name_for_file}.txt"
+
     pm = generate_preset_pass_manager(optimization_level=3, backend=backend_simulator)
     candidate_circuit = pm.run(circuit)
 
