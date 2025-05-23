@@ -1,7 +1,8 @@
+import sys
 import json
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.optimize import minimize
+import time
 
 # Packages for quantum stuff
 from qiskit.quantum_info import SparsePauliOp
@@ -18,9 +19,12 @@ from qiskit_ibm_runtime.fake_provider import (
     FakeSherbrooke,
 )  # For simulation with realistic noise
 
+# //////////    Variables    //////////
 file_name = "QUBO_batches/batch_QUBO_data_MaxCut_6q_.json"
+reps_p = 2
 
 
+# //////////    Functions    //////////
 def load_qubo_and_build_hamiltonian(file_path, instance_id):
     """
     Loads QUBO terms, weights, and constant from a JSON file.
@@ -107,47 +111,62 @@ def cost_func_estimator(
 
     numOptimisations = numOptimisations + 1
     # Your desired print format:
-    print(
-        f"Params: {params}, Cost: {cost_float}, Optimisation Round: {numOptimisations}"
-    )
+    # print(
+    #     f"Params: {params}, Cost: {cost_float}, Optimisation Round: {numOptimisations}"
+    # )
 
     return cost_float
 
 
-# variables
-instanceIndex = 5
-reps_p = 2
+if __name__ == "__main__":
+    print(sys.argv)
+    task_id = sys.argv.pop()
+    print(f"Instance ID: {task_id}")
+    instanceIndex = int(task_id)
 
+    cost_hamiltonian, constant_offset, num_qubits, problem_type = (
+        load_qubo_and_build_hamiltonian(file_name, instanceIndex)
+    )
 
-cost_hamiltonian, constant_offset, num_qubits, problem_type = (
-    load_qubo_and_build_hamiltonian(file_name, instanceIndex)
-)
-circuit = QAOAAnsatz(cost_operator=cost_hamiltonian, reps=reps_p)
-circuit.measure_all()
+    output_filename = f"Optimised_Params_{problem_type}_{num_qubits}q.txt"
 
-backend_simulator = AerSimulator()  # Ideal simulator
-# backend_simulator = AerSimulator.from_backend(FakeBrisbane()) # Simulator with IBM_Brisbane specific noise model
-# backend_simulator = AerSimulator.from_backend(FakeSherbrooke()) # Simulator with IBM_Sherbroke specific noise model
-pm = generate_preset_pass_manager(optimization_level=3, backend=backend_simulator)
-candidate_circuit = pm.run(circuit)
+    circuit = QAOAAnsatz(cost_operator=cost_hamiltonian, reps=reps_p)
+    circuit.measure_all()
 
-num_params = 2 * reps_p
-initial_betas = (np.random.rand(reps_p) * np.pi).tolist()
-initial_gammas = (np.random.rand(reps_p) * (np.pi)).tolist()
-initial_params = initial_betas + initial_gammas
+    backend_simulator = AerSimulator()  # Ideal simulator
+    # backend_simulator = AerSimulator.from_backend(FakeBrisbane()) # Simulator with IBM_Brisbane specific noise model
+    # backend_simulator = AerSimulator.from_backend(FakeSherbrooke()) # Simulator with IBM_Sherbroke specific noise model
+    pm = generate_preset_pass_manager(optimization_level=3, backend=backend_simulator)
+    candidate_circuit = pm.run(circuit)
 
-objective_func_vals = []
-numOptimisations = 0
+    num_params = 2 * reps_p
+    initial_betas = (np.random.rand(reps_p) * np.pi).tolist()
+    initial_gammas = (np.random.rand(reps_p) * (np.pi)).tolist()
+    initial_params = initial_betas + initial_gammas
 
-estimator = Estimator(mode=backend_simulator)
-print("Starting optimization...")
-result = minimize(
-    cost_func_estimator,
-    initial_params,
-    args=(candidate_circuit, estimator, cost_hamiltonian, constant_offset),
-    method="COBYLA",
-    tol=1e-3,
-    options={"maxiter": 1000},  # Adjust as needed
-)
-print("Optimization Result:")
-print(result.x)
+    objective_func_vals = []
+    numOptimisations = 0
+
+    estimator = Estimator(mode=backend_simulator)
+    print("Starting optimization...")
+    start_time = time.time()
+
+    result = minimize(
+        cost_func_estimator,
+        initial_params,
+        args=(candidate_circuit, estimator, cost_hamiltonian, constant_offset),
+        method="COBYLA",
+        tol=1e-3,
+        options={"maxiter": 1000},  # Adjust as needed
+    )
+    output = result.x
+    end_time = time.time()
+    elapsed_time = end_time - start_time  # Calculate elapsed time
+    cost = result.fun
+    print("Optimization Result:")
+    print(output)
+
+    with open(output_filename, "a") as f:
+        f.write(
+            f"Instance {instanceIndex}, Time: {elapsed_time:.4f}s, Cost: {cost}, Params: {output}\n"
+        )
