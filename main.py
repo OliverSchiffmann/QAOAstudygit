@@ -20,8 +20,10 @@ from qiskit_ibm_runtime.fake_provider import (
 )  # For simulation with realistic noise
 
 # //////////    Variables    //////////
-file_name = "QUBO_batches/batch_QUBO_data_MaxCut_6q_.json"
+file_name = "QUBO_batches/batch_QUBO_data_MaxCut_12q_.json"
 reps_p = 2
+# backend_simulator = AerSimulator()
+backend_simulator = AerSimulator.from_backend(FakeSherbrooke())
 
 
 # //////////    Functions    //////////
@@ -131,10 +133,6 @@ if __name__ == "__main__":
     circuit = QAOAAnsatz(cost_operator=cost_hamiltonian, reps=reps_p)
     circuit.measure_all()
 
-    backend_simulator = AerSimulator()  # Ideal simulator
-    # backend_simulator = AerSimulator.from_backend(FakeBrisbane()) # Simulator with IBM_Brisbane specific noise model
-    # backend_simulator = AerSimulator.from_backend(FakeSherbrooke()) # Simulator with IBM_Sherbroke specific noise model
-
     if "fake" in backend_simulator.name.lower():
         simulator_name_for_file = (
             backend_simulator.name.split("(")[1].lower().replace(")", "")
@@ -176,5 +174,5 @@ if __name__ == "__main__":
 
     with open(output_filename, "a") as f:
         f.write(
-            f"Instance {instanceIndex}, Time: {elapsed_time:.4f}s, Cost: {cost}, Params: {output}\n"
+            f"Instance: {instanceIndex}, Time: {elapsed_time:.4f}s, Number of optimisation loops: {numOptimisations}, Cost: {cost}, Params: {output}\n"
         )

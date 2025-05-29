@@ -1,14 +1,14 @@
 #!/bin/bash
  
-#SBATCH --job-name=test_job
-#SBATCH --partition=test
+#SBATCH --job-name=qaoaOptimisationSim
+#SBATCH --partition=mwvdk
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --time=0:1:0
+#SBATCH --ntasks-per-node=24
+#SBATCH --time=48:0:0
 #SBATCH --mem=100M
 #SBATCH --account=eeme036064
  
-#SBATCH --array=1-2
+#SBATCH --array=1-20
  
 #SBATCH --output=/dev/null
 
