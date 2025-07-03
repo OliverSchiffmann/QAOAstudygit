@@ -22,8 +22,8 @@ from qiskit_ibm_runtime.fake_provider import (
 # //////////    Variables    //////////
 file_name = "QUBO_batches/batch_QUBO_data_MaxCut_12q_.json"
 reps_p = 2
-# backend_simulator = AerSimulator()
-backend_simulator = AerSimulator.from_backend(FakeSherbrooke())
+backend_simulator = AerSimulator()
+# backend_simulator = AerSimulator.from_backend(FakeSherbrooke())
 
 
 # //////////    Functions    //////////

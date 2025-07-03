@@ -1,14 +1,14 @@
 #!/bin/bash
  
 #SBATCH --job-name=qaoaOptimisationSim
-#SBATCH --partition=mwvdk
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=24
 #SBATCH --time=48:0:0
 #SBATCH --mem=100M
 #SBATCH --account=eeme036064
  
-#SBATCH --array=1-20
+#SBATCH --array=1-5
  
 #SBATCH --output=/dev/null
 
