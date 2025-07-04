@@ -1,0 +1,16 @@
+{
+  "problem_type": "maximum_cut",
+  "num_qubits": 5,
+  "simulator_name": "fake_sherbrooke",
+  "results_by_depth": {
+    "1": [
+      -1.1504
+    ],
+    "2": [
+      -1.6465
+    ],
+    "3": [
+      -1.2251
+    ]
+  }
+}
