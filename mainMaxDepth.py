@@ -25,6 +25,9 @@ task_id = sys.argv.pop()
 
 # //////////    Variables    //////////
 repsPerProblemScale = 100
+testMode = (
+    False  # True for testing useing noise-free simulator, False for using noise models
+)
 
 
 # ////////////    Functions    //////////
@@ -246,6 +249,12 @@ elif chosenBackend == "FakeSherbrooke":
     backend_simulator = AerSimulator.from_backend(FakeSherbrooke())
 elif chosenBackend == "FakeTorino":
     backend_simulator = AerSimulator.from_backend(FakeTorino())
+
+if testMode == True:
+    repsPerProblemScale = 10
+    backend_simulator = AerSimulator()
+    chosenBackend = f"noiseless{task_id}"  # For naming the output file
+
 
 targetQubitRange = range(minScale, maxScale + 1)  # range of qubits to test
 if (

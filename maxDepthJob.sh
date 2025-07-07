@@ -1,7 +1,7 @@
 #!/bin/bash
  
 #SBATCH --job-name=maxProblemSizeInvestigation
-#SBATCH --partition=test
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=24
 #SBATCH --time=48:0:0
