@@ -32,95 +32,95 @@ testMode = (
 
 # ////////////    Functions    //////////
 def chooseVariables(task_id):
+    # if task_id == 1:
+    #     desiredProblemType = "TSP"  # options: 'Knapsack', 'TSP'
+    #     minScale = 4
+    #     maxScale = 9
+    #     reps_p = 1
+    #     chosenBackend = (
+    #         "FakeSherbrooke"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
+    #     )
+    # elif task_id == 2:
+    #     desiredProblemType = "TSP"  # options: 'Knapsack', 'TSP'
+    #     minScale = 4
+    #     maxScale = 9
+    #     reps_p = 1
+    #     chosenBackend = (
+    #         "FakeBrisbane"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
+    #     )
+    # elif task_id == 3:
+    #     desiredProblemType = "TSP"  # options: 'Knapsack', 'TSP'
+    #     minScale = 4
+    #     maxScale = 9
+    #     reps_p = 1
+    #     chosenBackend = (
+    #         "FakeTorino"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
+    #     )
+    # elif task_id == 4:
+    #     desiredProblemType = "TSP"  # options: 'Knapsack', 'TSP'
+    #     minScale = 4
+    #     maxScale = 9
+    #     reps_p = 2
+    #     chosenBackend = (
+    #         "FakeSherbrooke"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
+    #     )
+    # elif task_id == 5:
+    #     desiredProblemType = "TSP"  # options: 'Knapsack', 'TSP'
+    #     minScale = 4
+    #     maxScale = 9
+    #     reps_p = 2
+    #     chosenBackend = (
+    #         "FakeBrisbane"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
+    #     )
+    # elif task_id == 6:
+    #     desiredProblemType = "TSP"  # options: 'Knapsack', 'TSP'
+    #     minScale = 4
+    #     maxScale = 9
+    #     reps_p = 2
+    #     chosenBackend = (
+    #         "FakeTorino"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
+    #     )
+    # elif task_id == 7: #I have results for this set of params now
+    #     desiredProblemType = "Knapsack"
+    #     minScale = 2
+    #     maxScale = 12
+    #     reps_p = 1
+    #     chosenBackend = (
+    #         "FakeSherbrooke"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
+    #     )
+    # elif task_id == 8: #I have results for this set of params now
+    #     desiredProblemType = "Knapsack"
+    #     minScale = 2
+    #     maxScale = 12
+    #     reps_p = 1
+    #     chosenBackend = (
+    #         "FakeBrisbane"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
+    #     )
+    # elif task_id == 9: #I have results for this set of params now
+    #     desiredProblemType = "Knapsack"
+    #     minScale = 2
+    #     maxScale = 12
+    #     reps_p = 1
+    #     chosenBackend = (
+    #         "FakeTorino"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
+    #     )
     if task_id == 1:
-        desiredProblemType = "TSP"  # options: 'Knapsack', 'TSP'
-        minScale = 4
-        maxScale = 16
-        reps_p = 1
+        desiredProblemType = "Knapsack"
+        minScale = 2
+        maxScale = 12
+        reps_p = 2
         chosenBackend = (
             "FakeSherbrooke"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
         )
     elif task_id == 2:
-        desiredProblemType = "TSP"  # options: 'Knapsack', 'TSP'
-        minScale = 4
-        maxScale = 16
-        reps_p = 1
+        desiredProblemType = "Knapsack"
+        minScale = 2
+        maxScale = 12
+        reps_p = 2
         chosenBackend = (
             "FakeBrisbane"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
         )
     elif task_id == 3:
-        desiredProblemType = "TSP"  # options: 'Knapsack', 'TSP'
-        minScale = 4
-        maxScale = 16
-        reps_p = 1
-        chosenBackend = (
-            "FakeTorino"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
-        )
-    elif task_id == 4:
-        desiredProblemType = "TSP"  # options: 'Knapsack', 'TSP'
-        minScale = 4
-        maxScale = 16
-        reps_p = 2
-        chosenBackend = (
-            "FakeSherbrooke"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
-        )
-    elif task_id == 5:
-        desiredProblemType = "TSP"  # options: 'Knapsack', 'TSP'
-        minScale = 4
-        maxScale = 16
-        reps_p = 2
-        chosenBackend = (
-            "FakeBrisbane"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
-        )
-    elif task_id == 6:
-        desiredProblemType = "TSP"  # options: 'Knapsack', 'TSP'
-        minScale = 4
-        maxScale = 16
-        reps_p = 2
-        chosenBackend = (
-            "FakeTorino"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
-        )
-    elif task_id == 7:
-        desiredProblemType = "Knapsack"
-        minScale = 2
-        maxScale = 12
-        reps_p = 1
-        chosenBackend = (
-            "FakeSherbrooke"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
-        )
-    elif task_id == 8:
-        desiredProblemType = "Knapsack"
-        minScale = 2
-        maxScale = 12
-        reps_p = 1
-        chosenBackend = (
-            "FakeBrisbane"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
-        )
-    elif task_id == 9:
-        desiredProblemType = "Knapsack"
-        minScale = 2
-        maxScale = 12
-        reps_p = 1
-        chosenBackend = (
-            "FakeTorino"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
-        )
-    elif task_id == 10:
-        desiredProblemType = "Knapsack"
-        minScale = 2
-        maxScale = 12
-        reps_p = 2
-        chosenBackend = (
-            "FakeSherbrooke"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
-        )
-    elif task_id == 11:
-        desiredProblemType = "Knapsack"
-        minScale = 2
-        maxScale = 12
-        reps_p = 2
-        chosenBackend = (
-            "FakeBrisbane"  # options: 'FakeSherbrooke', 'FakeBrisbane', 'FakeTorino'
-        )
-    elif task_id == 12:
         desiredProblemType = "Knapsack"
         minScale = 2
         maxScale = 12
@@ -260,7 +260,8 @@ targetQubitRange = range(minScale, maxScale + 1)  # range of qubits to test
 if (
     desiredProblemType == "TSP"
 ):  # this bit is because i am lazy and TSP can only work for qubit numbers that are squares (4,9,16,25...)
-    targetQubitRange = (minScale, 9, maxScale)
+    targetQubitRange = (minScale, maxScale)
+
 
 # Training the QAOA for each problem scale and getting the best parameters for each scale achieved after 'repsPerProblemScale' runs
 bestParameters = {}
