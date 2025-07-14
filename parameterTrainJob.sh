@@ -24,4 +24,4 @@ cd qaoaSim
 source IBMQSimvenv/bin/activate
  
 # Run the script passing in the task id value
-python main.py ${SLURM_ARRAY_TASK_ID}
+python mainParameterTrain.py ${SLURM_ARRAY_TASK_ID}
