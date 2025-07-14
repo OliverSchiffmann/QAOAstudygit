@@ -17,13 +17,13 @@ from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
 from qiskit_ibm_runtime.fake_provider import (
     FakeBrisbane,
     FakeSherbrooke,
+    FakeTorino,
 )  # For simulation with realistic noise
 
 # //////////    Variables    //////////
-file_name = "QUBO_batches/batch_QUBO_data_MaxCut_12q_.json"
-reps_p = 2
+reps_p = 1
 backend_simulator = AerSimulator()
-# backend_simulator = AerSimulator.from_backend(FakeSherbrooke())
+# backend_simulator = AerSimulator.from_backend(FakeTorino())
 
 
 # //////////    Functions    //////////
@@ -93,12 +93,7 @@ def load_qubo_and_build_hamiltonian(file_path, instance_id):
 
 
 def cost_func_estimator(
-    params,
-    ansatz,
-    estimator,
-    cost_hamiltonian_logical,
-    constant_offset,
-    backend_total_qubits=127,
+    params, ansatz, estimator, cost_hamiltonian_logical, constant_offset
 ):  # removed default for backend_total_qubits
     global numOptimisations
     prepared_observable = cost_hamiltonian_logical.apply_layout(ansatz.layout)
@@ -121,9 +116,8 @@ def cost_func_estimator(
 
 
 if __name__ == "__main__":
-    print(sys.argv)
-    task_id = sys.argv.pop()
-    print(f"Instance ID: {task_id}")
+    file_name = sys.argv[1]
+    task_id = sys.argv[2]
     instanceIndex = int(task_id)
 
     cost_hamiltonian, constant_offset, num_qubits, problem_type = (
@@ -140,7 +134,7 @@ if __name__ == "__main__":
     else:
         simulator_name_for_file = "aer_simulator_ideal"
 
-    output_filename = f"Optimised_Params_{problem_type}_{num_qubits}q_on_{simulator_name_for_file}.txt"
+    output_filename = f"parameterTrainingResults/Optimised_Params_{problem_type}_{num_qubits}q_on_{simulator_name_for_file}.txt"
 
     pm = generate_preset_pass_manager(optimization_level=3, backend=backend_simulator)
     candidate_circuit = pm.run(circuit)
