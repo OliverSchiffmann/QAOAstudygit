@@ -1,5 +1,6 @@
 openQAOAvenv
 IBMQpynbvenv
+classicalvenv
 __pycache__/
 *.pyc
 *.pyo
