@@ -134,7 +134,7 @@ if __name__ == "__main__":
     else:
         simulator_name_for_file = "aer_simulator_ideal"
 
-    output_filename = f"parameterTrainingResults/Optimised_Params_{problem_type}_{num_qubits}q_on_{simulator_name_for_file}.txt"
+    output_filename = f"isingBatches/Optimised_Params_{problem_type}_{num_qubits}q_on_{simulator_name_for_file}.txt"
 
     pm = generate_preset_pass_manager(optimization_level=3, backend=backend_simulator)
     candidate_circuit = pm.run(circuit)

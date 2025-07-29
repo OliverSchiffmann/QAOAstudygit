@@ -1,14 +1,14 @@
 #!/bin/bash
  
 #SBATCH --job-name=qaoaOptimisationSim
-#SBATCH --partition=test
+#SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=24
-#SBATCH --time=1:0:0
+#SBATCH --time=24:0:0
 #SBATCH --mem=100M
 #SBATCH --account=eeme036064
  
-#SBATCH --array=1-15
+#SBATCH --array=1-100
  
 #SBATCH --output=/dev/null
 
@@ -24,5 +24,4 @@ cd qaoaSim
 source IBMQSimvenv/bin/activate
  
 # Run the script passing in the task id and the QUBO file
-python mainParameterTrain.py "QUBO_batches/batch_QUBO_data_TSP_9q_.json" ${SLURM_ARRAY_TASK_ID}
-#python mainParameterTrain.py "QUBO_batches/batch_QUBO_data_Knapsack_9q_.json" ${SLURM_ARRAY_TASK_ID}
+python mainParameterTrain.py "isingBatches/batch_Ising_data_TSP_9q_.json" ${SLURM_ARRAY_TASK_ID}
