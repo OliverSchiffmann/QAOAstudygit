@@ -107,10 +107,6 @@ def cost_func_estimator(
     objective_func_vals.append(cost_float)
 
     numOptimisations = numOptimisations + 1
-    # Your desired print format:
-    # print(
-    #     f"Params: {params}, Cost: {cost_float}, Optimisation Round: {numOptimisations}"
-    # )
 
     return cost_float
 
