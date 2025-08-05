@@ -6,6 +6,7 @@ import time
 
 # Packages for quantum stuff
 from qiskit.quantum_info import SparsePauliOp
+from qiskit.circuit import QuantumCircuit
 from qiskit.circuit.library import QAOAAnsatz
 from qiskit_aer import AerSimulator
 from qiskit_ibm_runtime import (
@@ -21,52 +22,46 @@ from qiskit_ibm_runtime.fake_provider import (
 )  # For simulation with realistic noise
 
 # //////////    Variables    //////////
-reps_p = 1
+reps_p = 20
 backend_simulator = AerSimulator()
 # backend_simulator = AerSimulator.from_backend(FakeTorino())
 
 
 # //////////    Functions    //////////
-def load_qubo_and_build_hamiltonian(file_path, instance_id):
+def load_ising_and_build_hamiltonian(file_path, instance_id):
     """
-    Loads QUBO terms, weights, and constant from a JSON file.
+    Loads Ising terms and weights from a JSON file.
     Determines the number of qubits from the terms and constructs
     the Hamiltonian as a Qiskit SparsePauliOp.
     """
 
     with open(file_path, "r") as f:
-        all_qubos_data = json.load(f)  # Assumes this loads a list of dicts
+        all_isings_data = json.load(f)  # Assumes this loads a list of dicts
 
-    selected_qubo_data = None
-    # Find the dictionary for the specified instance_id
-    for qubo_instance in all_qubos_data:
+    selected_ising_data = None
+    # Find the desired ising model within list
+    for ising_instance in all_isings_data:
         if (
-            qubo_instance["instance_id"] == instance_id
+            ising_instance["instance_id"] == instance_id
         ):  # Assumes 'instance_id' exists and is correct
-            selected_qubo_data = qubo_instance
+            selected_ising_data = ising_instance
             break
 
-    terms = selected_qubo_data["terms"]
-    weights = selected_qubo_data["weights"]
-    constant = selected_qubo_data.get("constant", 0.0)
-    problemType = selected_qubo_data.get("problem_type")
+    terms = selected_ising_data["terms"]
+    weights = selected_ising_data["weights"]
+    problem_type = selected_ising_data.get("problem_type")
 
     pauli_list = []
     num_qubits = 0
 
-    if terms:
-        # Flatten the list of lists and filter out empty sublists or non-integer elements
-        all_indices = []
-        for term_group in terms:
-            for idx in term_group:
-                all_indices.append(idx)
-        num_qubits = max(all_indices) + 1
+    # Find the max number of qubits by finding the biggest index of ising variables
+    all_indices = []
+    for term_group in terms:
+        for idx in term_group:
+            all_indices.append(idx)
+    num_qubits = max(all_indices) + 1
 
     for term_indices, weight in zip(terms, weights):
-        if not term_indices or not all(isinstance(idx, int) for idx in term_indices):
-            # Skip if term_indices is empty or contains non-integers
-            continue
-
         paulis_arr = ["I"] * num_qubits
         if len(term_indices) == 1:  # Linear term
             paulis_arr[term_indices[0]] = "Z"
@@ -74,26 +69,15 @@ def load_qubo_and_build_hamiltonian(file_path, instance_id):
             paulis_arr[term_indices[0]] = "Z"
             paulis_arr[term_indices[1]] = "Z"
 
-        pauli_list.append(("".join(paulis_arr)[::-1], weight))
-
-    if (
-        not pauli_list and num_qubits > 0
-    ):  # No valid Pauli terms were created, but num_qubits > 0
-        cost_hamiltonian = SparsePauliOp(
-            ["I"] * num_qubits, [0]
-        )  # Zero operator on n_qubits
-    elif not pauli_list and num_qubits == 0:
-        cost_hamiltonian = SparsePauliOp(
-            "I", [0]
-        )  # Placeholder for 1 qubit if everything is empty
-    else:
-        cost_hamiltonian = SparsePauliOp.from_list(pauli_list)
-
-    return cost_hamiltonian, constant, num_qubits, problemType
+        pauli_list.append(
+            ("".join(paulis_arr)[::-1], weight)
+        )  # how from_list works here: https://quantum.cloud.ibm.com/docs/en/api/qiskit/qiskit.quantum_info.SparsePauliOp
+    hamiltonian = SparsePauliOp.from_list(pauli_list)
+    return hamiltonian, num_qubits, problem_type
 
 
 def cost_func_estimator(
-    params, ansatz, estimator, cost_hamiltonian_logical, constant_offset
+    params, ansatz, estimator, cost_hamiltonian_logical
 ):  # removed default for backend_total_qubits
     global numOptimisations
     prepared_observable = cost_hamiltonian_logical.apply_layout(ansatz.layout)
@@ -103,7 +87,7 @@ def cost_func_estimator(
     results = job.result()[0]
     cost = results.data.evs[0]
 
-    cost_float = float(np.real(cost)) + constant_offset
+    cost_float = float(np.real(cost))
     objective_func_vals.append(cost_float)
 
     numOptimisations = numOptimisations + 1
@@ -116,11 +100,19 @@ if __name__ == "__main__":
     task_id = sys.argv[2]
     instanceIndex = int(task_id)
 
-    cost_hamiltonian, constant_offset, num_qubits, problem_type = (
-        load_qubo_and_build_hamiltonian(file_name, instanceIndex)
+    cost_hamiltonian, num_qubits, problem_type = load_ising_and_build_hamiltonian(
+        file_name, instanceIndex
     )
+    initialCircuit = None
+    if problem_type == "tsp":
+        initialCircuit = QuantumCircuit(num_qubits)
+        initialCircuit.x(
+            [0, 4, 8]
+        )  # this is a solution for TSP but not other problem classes
 
-    circuit = QAOAAnsatz(cost_operator=cost_hamiltonian, reps=reps_p)
+    circuit = QAOAAnsatz(
+        cost_operator=cost_hamiltonian, reps=reps_p, initial_state=initialCircuit
+    )
     circuit.measure_all()
 
     if "fake" in backend_simulator.name.lower():
@@ -150,7 +142,7 @@ if __name__ == "__main__":
     result = minimize(
         cost_func_estimator,
         initial_params,
-        args=(candidate_circuit, estimator, cost_hamiltonian, constant_offset),
+        args=(candidate_circuit, estimator, cost_hamiltonian),
         method="COBYLA",
         tol=1e-3,
         options={"maxiter": 1000},  # Adjust as needed
