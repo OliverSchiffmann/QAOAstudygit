@@ -1,5 +1,6 @@
 import sys
 import os
+import uuid
 from filelock import FileLock
 import json
 import numpy as np
@@ -121,55 +122,23 @@ def build_mixer_hamiltonian(constraints, num_qubits):
     return mixer_hamiltonian
 
 
-def save_results_to_json(
-    results_folder, metadata, run_result, file_name="results.json"
-):
-    """
-    Saves QAOA run results to a JSON file, handling concurrent writes.
-
-    If the file doesn't exist, it's created with metadata and the first result.
-    If it exists, the new result is appended to the 'results' list.
-    A file lock is used to prevent race conditions from batch jobs.
-
-    Args:
-        results_folder (str): The name of the folder to save results in.
-        metadata (dict): A dictionary with overall run info like 'qaoaLayers'.
-        run_result (dict): A dictionary containing the results of this specific run.
-        file_name (str): The name of the JSON file to save to.
-    """
-    # Ensure the target directory exists
-    os.makedirs(results_folder, exist_ok=True)
-    file_path = os.path.join(results_folder, file_name)
-
-    # Use a lock file to prevent race conditions during file access
-    lock_path = file_path + ".lock"
-    lock = FileLock(lock_path)
-
-    with lock:
-        try:
-            # If file exists, read it, append the new result, and write back
-            with open(file_path, "r") as f:
-                data = json.load(f)
-            data["results"].append(run_result)
-        except (FileNotFoundError, json.JSONDecodeError):
-            # If file doesn't exist or is empty/corrupt, create the initial structure
-            data = {"metadata": metadata, "results": [run_result]}
-
-        # Write the updated data back to the file
-        with open(file_path, "w") as f:
-            # Use the custom encoder for NumPy arrays and indent for readability
-            json.dump(data, f, indent=4, cls=NumpyArrayEncoder)
+def save_single_result(folder_path, file_name, data):
+    """Saves a single data dictionary to a JSON file. No locking or reading needed."""
+    os.makedirs(folder_path, exist_ok=True)
+    file_path = os.path.join(folder_path, file_name)
+    with open(file_path, "w") as f:
+        json.dump(data, f, indent=4, cls=NumpyArrayEncoder)
 
 
 if __name__ == "__main__":
     # debugging variables
-    # instanceOfInterest = 6
+    instanceOfInterest = 2
 
     # //////////    Variables    //////////
-    reps_p = 20
+    reps_p = 1
     backend_simulator = AerSimulator()
     # backend_simulator = AerSimulator.from_backend(FakeTorino())
-    instanceOfInterest = int(sys.argv[2])
+    # instanceOfInterest = int(sys.argv[2])
     FILEDIRECTORY = "isingBatches"
     isingFileName = FILEDIRECTORY + "/batch_Ising_data_TSP_9q_.json"
     outputFilename = "TSP_QAOA_IBM_batch_results.json"
@@ -243,6 +212,12 @@ if __name__ == "__main__":
     print("Distribution:", sortedDist)
 
     # /// Saving results ///
+    # DEFINE A DEDICATED FOLDER FOR THE INDIVIDUAL RESULTS
+    INDIVIDUAL_RESULTS_FOLDER = "individual_results"
+
+    # CREATE A UNIQUE FILENAME FOR THIS JOB'S RESULT
+    output_filename_unique = f"result_instance_{instanceOfInterest}.json"
+
     run_metadata = {"qaoaLayers": reps_p, "backend_name": backend_simulator.name}
     current_run_data = {
         "instance_id": instanceOfInterest,
@@ -251,9 +226,13 @@ if __name__ == "__main__":
         "final_training_cost": trainResult.fun,
         "optimal_params": trainResult.x,
     }
-    save_results_to_json(
-        results_folder=FILEDIRECTORY,
-        metadata=run_metadata,
-        run_result=current_run_data,
-        file_name=outputFilename,
+
+    # Combine metadata and the result for this single run
+    data_to_save = {"metadata": run_metadata, "result": current_run_data}
+
+    # Call the new, simple save function
+    save_single_result(
+        folder_path=INDIVIDUAL_RESULTS_FOLDER,
+        file_name=output_filename_unique,
+        data=data_to_save,
     )
