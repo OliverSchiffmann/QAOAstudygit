@@ -106,27 +106,6 @@ def cost_func_estimator(params, ansatz, estimator, cost_hamiltonian):
     return cost_float
 
 
-def build_mixer_hamiltonian(constraints, num_qubits):
-    pauli_list = []
-    for group in constraints:
-        # Create pairs of all qubits within the constrained group
-        for qubit_pair in combinations(group, 2):
-            # Create the XX term
-            xx_pauli = ["I"] * num_qubits
-            xx_pauli[qubit_pair[0]] = "X"
-            xx_pauli[qubit_pair[1]] = "X"
-            # Add to the list (in Qiskit's reversed order) with a coefficient of 1.0
-            pauli_list.append(("".join(xx_pauli)[::-1], 1.0))
-
-            # Create the YY term
-            yy_pauli = ["I"] * num_qubits
-            yy_pauli[qubit_pair[0]] = "Y"
-            yy_pauli[qubit_pair[1]] = "Y"
-            pauli_list.append(("".join(yy_pauli)[::-1], 1.0))
-    mixer_hamiltonian = SparsePauliOp.from_list(pauli_list)
-    return mixer_hamiltonian
-
-
 def save_single_result(folder_path, file_name, data):
     """Saves a single data dictionary to a JSON file. No locking or reading needed."""
     os.makedirs(folder_path, exist_ok=True)
