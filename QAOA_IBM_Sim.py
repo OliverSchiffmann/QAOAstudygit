@@ -8,6 +8,7 @@ import numpy as np
 from scipy.optimize import minimize
 import time
 from itertools import combinations
+from config import problem_configs
 
 # Packages for quantum stuff
 from qiskit.quantum_info import SparsePauliOp
@@ -144,13 +145,6 @@ def setup_configuration():
     args = parser.parse_args()
     problem_type = args.problem_type
     instance_of_interest = args.instance_id
-
-    problem_configs = {
-        "TSP": {"file_slug": "TSP_9q_", "qubits": 9},
-        "Knapsack": {"file_slug": "Knapsack_6_items_9q_", "qubits": 9, "items": 6},
-        # Can easily add more problem classes here in the future
-        # 'MaxCut': { ... }
-    }
 
     # Select the configuration based on the determined problem_type
     try:
