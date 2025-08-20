@@ -204,7 +204,19 @@ def build_mixer_hamiltonian(num_qubits, problem_type):
 
         mixer_hamiltonian = SparsePauliOp.from_list(pauli_list)
         return mixer_hamiltonian
+    elif problem_type == "MinimumVertexCover":
+        print("Building Mixer Hamiltonian for Minimum Vertex Cover...")
+        pauli_list = []
+        for i in range(num_qubits):
+            # Create an X operator on the i-th qubit
+            x_pauli = ["I"] * num_qubits
+            x_pauli[i] = "X"
 
+            # Add to the list (in Qiskit's reversed order) with a coefficient of 1.0
+            pauli_list.append(("".join(x_pauli)[::-1], 1.0))
+
+        mixer_hamiltonian = SparsePauliOp.from_list(pauli_list)
+        return mixer_hamiltonian
     else:
         raise ValueError(f"Unknown problem_type: {problem_type}")
 
@@ -230,6 +242,8 @@ def create_inital_state(num_qubits, problem_type, weight_capacity=None):
         initial_circuit.x(
             target_qubits
         )  # creates the inital state encoding an empty knapsack with slack variables = weight capacity
+    elif problem_type == "MinimumVertexCover":
+        initial_circuit.h(range(num_qubits))
     else:
         raise ValueError(f"Unknown problem_type: {problem_type}")
 
