@@ -86,8 +86,8 @@ def load_ising_and_build_hamiltonian(file_path, instance_id):
     hamiltonian = SparsePauliOp.from_list(pauli_list)
     if problem_type == "knapsack":
         weight_capacity = selected_ising_data.get("weight_capacity")
-        return hamiltonian, num_qubits, weight_capacity
-    return hamiltonian, num_qubits, None
+        return hamiltonian, num_qubits, terms, weight_capacity
+    return hamiltonian, num_qubits, terms, None
 
 
 def cost_func_estimator(params, ansatz, estimator, cost_hamiltonian):
@@ -162,7 +162,7 @@ def setup_configuration():
     return problem_type, instance_of_interest, ising_file_name, problem_file_name_tag
 
 
-def build_mixer_hamiltonian(num_qubits, problem_type):
+def build_mixer_hamiltonian(num_qubits, problem_type, terms):
     if problem_type == "TSP":
         print("Building mixer Hamiltonian for TSP...")
         if num_qubits != 9:
@@ -206,16 +206,44 @@ def build_mixer_hamiltonian(num_qubits, problem_type):
         return mixer_hamiltonian
     elif problem_type == "MinimumVertexCover":
         print("Building Mixer Hamiltonian for Minimum Vertex Cover...")
+
+        # edges = []
+        # for term in terms:
+        #     # A quadratic term (representing an edge in the original problem graph) is a list of two indices
+        #     if len(term) == 2:
+        #         edges.append(tuple(term))
+
+        # pauli_list = []
+
+        # for i in range(num_qubits):
+        #     x_pauli = ["I"] * num_qubits
+        #     x_pauli[i] = "X"
+        #     pauli_list.append(("".join(x_pauli)[::-1], 1.0))
+
+        # for qubit_pair in edges:
+        #     # Create the XX term
+        #     xx_pauli = ["I"] * num_qubits
+        #     xx_pauli[qubit_pair[0]] = "X"
+        #     xx_pauli[qubit_pair[1]] = "X"
+        #     pauli_list.append(("".join(xx_pauli)[::-1], 1.0))
+
+        #     # Create the YY term
+        #     yy_pauli = ["I"] * num_qubits
+        #     yy_pauli[qubit_pair[0]] = "Y"
+        #     yy_pauli[qubit_pair[1]] = "Y"
+        #     pauli_list.append(("".join(yy_pauli)[::-1], 1.0))
+
+        # mixer_hamiltonian = SparsePauliOp.from_list(pauli_list)
+
         pauli_list = []
         for i in range(num_qubits):
             # Create an X operator on the i-th qubit
             x_pauli = ["I"] * num_qubits
             x_pauli[i] = "X"
-
             # Add to the list (in Qiskit's reversed order) with a coefficient of 1.0
             pauli_list.append(("".join(x_pauli)[::-1], 1.0))
-
         mixer_hamiltonian = SparsePauliOp.from_list(pauli_list)
+
         return mixer_hamiltonian
     else:
         raise ValueError(f"Unknown problem_type: {problem_type}")
@@ -243,7 +271,10 @@ def create_inital_state(num_qubits, problem_type, weight_capacity=None):
             target_qubits
         )  # creates the inital state encoding an empty knapsack with slack variables = weight capacity
     elif problem_type == "MinimumVertexCover":
-        initial_circuit.h(range(num_qubits))
+        # initial_circuit.h(range(num_qubits))
+        initial_circuit.x(
+            [0, 1, 2, 3, 4, 5, 6, 7]
+        )  # qubits take value 1 to represent node inclusion in set, last qubit (8) left as 0 to represent inital state with all but one node in the cover set
     else:
         raise ValueError(f"Unknown problem_type: {problem_type}")
 
@@ -271,15 +302,17 @@ if __name__ == "__main__":
 
     # /// training ///
     # --- cost hamiltonian ---
-    costHamil, numQubits, weightCapacity = load_ising_and_build_hamiltonian(
+    costHamil, numQubits, isingTerms, weightCapacity = load_ising_and_build_hamiltonian(
         isingFileName, instanceOfInterest
     )
     print(f"Problem class is: {problemType}")
     if problemType == "Knapsack":
         print(f"Capacity of this knapsack is: {weightCapacity}")
 
+    print(f"Quadratic and linear terms of the Ising model are: {isingTerms}")
+
     # --- mixer ---
-    mixerHamil = build_mixer_hamiltonian(numQubits, problemType)
+    mixerHamil = build_mixer_hamiltonian(numQubits, problemType, isingTerms)
     print(mixerHamil)
 
     # --- inital state ---
@@ -299,9 +332,13 @@ if __name__ == "__main__":
     candidate_circuit = pm.run(circuit)
 
     # creating random inital parameters
-    num_params = 2 * reps_p
-    initial_betas = (np.random.rand(reps_p) * np.pi).tolist()
-    initial_gammas = (np.random.rand(reps_p) * (np.pi)).tolist()
+    # num_params = 2 * reps_p
+    # initial_betas = (np.random.rand(reps_p) * np.pi).tolist()
+    # initial_gammas = (np.random.rand(reps_p) * (np.pi)).tolist()
+
+    # trying linear ramp schedule again in case
+    initial_betas = np.linspace(np.pi, 0, reps_p, endpoint=False).tolist()
+    initial_gammas = np.linspace(0, np.pi, reps_p, endpoint=False).tolist()
     initial_params = initial_betas + initial_gammas
 
     # starting training loop
