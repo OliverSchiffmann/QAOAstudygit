@@ -1,3 +1,4 @@
+# Same as other job script but trying to implement a layer by layer optimsation of betas and gammas
 import sys
 import argparse
 import os
@@ -276,10 +277,9 @@ def create_inital_state(num_qubits, problem_type, weight_capacity=None):
         #     initial_circuit.x(target_qubits)
         # actually dont need the weight capacity if i want tos tart with a full sack because that is alwasy 000
 
-        # initial_circuit.h(
-        #     [3, 4, 5, 6, 7, 8]
-        # )  # creates the inital state encoding slack variables = weight capacity and even superposition over decision variables
-        initial_circuit.x([3])
+        initial_circuit.h(
+            [3, 4, 5, 6, 7, 8]
+        )  # creates the inital state encoding full sack and even superposition over decision variables
 
     elif problem_type == "MinimumVertexCover":
         # initial_circuit.h(range(num_qubits))
@@ -330,40 +330,55 @@ if __name__ == "__main__":
     initialCircuit = create_inital_state(numQubits, problemType, weightCapacity)
     print(initialCircuit)
 
-    # --- QAOA Ansatz ---
-    qaoaKwargs = {
-        "cost_operator": costHamil,
-        "reps": reps_p,
-        "initial_state": initialCircuit,
-        "mixer_operator": mixerHamil,
-    }
-    circuit = QAOAAnsatz(**qaoaKwargs)
-    circuit.measure_all()
-    pm = generate_preset_pass_manager(optimization_level=3, backend=backend_simulator)
-    candidate_circuit = pm.run(circuit)
+    print("\n--- Starting Layer-by-Layer Optimization ---")
+    optimalParamsFromPreviousLayer = []
+    finalTrainResult = None
+    totalNumOptimisations = 0
 
-    # creating random inital parameters
-    # num_params = 2 * reps_p
-    # initial_betas = (np.random.rand(reps_p) * np.pi).tolist()
-    # initial_gammas = (np.random.rand(reps_p) * (np.pi)).tolist()
+    for p in range(1, reps_p + 1):
+        print(f"\nOptimizing layer p = {p}/{reps_p}...")
+        # --- QAOA Ansatz ---
+        qaoaKwargs = {
+            "cost_operator": costHamil,
+            "reps": p,
+            "initial_state": initialCircuit,
+            "mixer_operator": mixerHamil,
+        }
+        circuit = QAOAAnsatz(**qaoaKwargs)
+        circuit.measure_all()
+        pm = generate_preset_pass_manager(
+            optimization_level=3, backend=backend_simulator
+        )
+        candidate_circuit = pm.run(circuit)
 
-    # trying linear ramp schedule again in case
-    initial_betas = np.linspace(np.pi, 0, reps_p, endpoint=False).tolist()
-    initial_gammas = np.linspace(0, np.pi, reps_p, endpoint=False).tolist()
-    initial_params = initial_betas + initial_gammas
+        new_beta_guess = np.random.rand() * 0.1
+        new_gamma_guess = np.random.rand() * 0.1
+        initial_params = optimalParamsFromPreviousLayer + [
+            new_beta_guess,
+            new_gamma_guess,
+        ]
 
-    # starting training loop
-    objective_func_vals = []
-    numOptimisations = 0
-    estimator = Estimator(mode=backend_simulator)
-    trainResult = minimize(
-        cost_func_estimator,
-        initial_params,
-        args=(candidate_circuit, estimator, costHamil),
-        method="COBYLA",  # Using COBYLA for gradient free optimization also fast
-        tol=1e-3,
-        options={"maxiter": 1000},
-    )
+        # starting training loop
+        objective_func_vals = []
+        numOptimisations = 0
+        estimator = Estimator(mode=backend_simulator)
+        trainResult = minimize(
+            cost_func_estimator,
+            initial_params,
+            args=(candidate_circuit, estimator, costHamil),
+            method="COBYLA",  # Using COBYLA for gradient free optimization also fast
+            tol=1e-3,
+            options={"maxiter": 1000},
+        )
+        optimalParamsFromPreviousLayer = trainResult.x.tolist()
+        finalTrainResult = trainResult  # Keep track of the last result
+        totalNumOptimisations += numOptimisations
+        print(
+            f"p={p} complete. Cost: {trainResult.fun:.4f}, Number of optimsation loops: {numOptimisations}"
+        )
+
+    trainResult = finalTrainResult
+    print("\n--- Layer-by-Layer Optimization Complete ---")
     print(trainResult.x, trainResult.fun, numOptimisations)
 
     # /// Sampling ///
@@ -387,7 +402,7 @@ if __name__ == "__main__":
     current_run_data = {
         "instance_id": instanceOfInterest,
         "sampled_distribution": sortedDist,
-        "num_training_loops": numOptimisations,
+        "num_training_loops": totalNumOptimisations,
         "final_training_cost": trainResult.fun,
         "optimal_params": trainResult.x,
     }
