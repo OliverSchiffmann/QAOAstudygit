@@ -2,11 +2,13 @@ import sys
 import argparse
 import os
 import json
+import time
 import numpy as np
 from scipy.optimize import minimize
 from itertools import combinations
 from config import problem_configs
 from dotenv import load_dotenv
+from requests.exceptions import ConnectionError
 from concurrent.futures import ThreadPoolExecutor, as_completed, ProcessPoolExecutor
 
 
@@ -43,17 +45,38 @@ class QAOACallback:
         self.objectiveFuncVals = []
 
     def cost_func_estimator(self, params, instance_id):
-        """The cost function to be called by scipy.minimize."""
-        transpiledHamil = self.costHamiltonian.apply_layout(self.ansatz.layout)
-        pub = (self.ansatz, transpiledHamil, params)
-        job = self.estimator.run([pub])
-        results = job.result()[0]
-        cost = results.data.evs
-        costFloat = float(np.real(cost))
-        self.objectiveFuncVals.append(costFloat)
-        self.numOptimisations += 1
-        print(f"(Instance: {instance_id}) Optimization step {self.numOptimisations}")
-        return costFloat
+        """A robust cost function that handles network errors."""
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                # --- This is the code that can fail ---
+                transpiledHamil = self.costHamiltonian.apply_layout(self.ansatz.layout)
+                pub = (self.ansatz, transpiledHamil, params)
+                job = self.estimator.run([pub])
+                results = job.result()[0]
+                cost = results.data.evs
+                costFloat = float(np.real(cost))
+                self.objectiveFuncVals.append(costFloat)
+                self.numOptimisations += 1
+                print(
+                    f"(Instance: {instance_id}) Optimization step {self.numOptimisations}"
+                )
+                return costFloat
+
+            except ConnectionError as e:
+                print(f"Network error on attempt {attempt + 1}: {e}. Retrying...")
+                time.sleep(2)
+
+            except Exception as e:
+                # Catch any other potential errors from the job
+                print(f"An unexpected job error occurred: {e}. Penalizing this step.")
+                break
+
+        # If all retries fail, penalize this parameter set
+        print(
+            f"All network attempts failed for instance {instance_id}. Returning infinity."
+        )
+        return float("inf")
 
     def cost_function_wrapper(
         self, params, instance_id
@@ -385,7 +408,7 @@ def runSingleSimulation(args):
         instanceOfInterest,
         method="COBYLA",  # chosen to work with bounds (COBYLA doesnt)
         tol=1e-3,
-        options={"maxiter": 1000},  # You can increase this for real runs
+        options={"maxiter": 500},  # You can increase this for real runs
     )
     # --- Sampling ---
     optimizedCircuit = candidateCircuit.assign_parameters(trainResult.x)
