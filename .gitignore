@@ -1,6 +1,8 @@
 openQAOAvenv
 IBMQpynbvenv
 classicalvenv
+qiskitQAOAvenv
+.env
 __pycache__/
 *.pyc
 *.pyo
@@ -9,4 +11,4 @@ __pycache__/
 *.egg-info/
 *.egg
 *.whl
-*.log
+*.log 

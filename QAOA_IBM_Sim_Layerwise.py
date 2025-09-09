@@ -1,4 +1,4 @@
-# Same as other job script but trying to implement a layer by layer optimsation of betas and gammas
+# Same as other job script but trying to implement a layer by layer optimsation of betas and gammas, takes a lot longer and didnt seem to make much difference
 import sys
 import argparse
 import os

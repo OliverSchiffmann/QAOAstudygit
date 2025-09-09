@@ -360,7 +360,7 @@ if __name__ == "__main__":
         cost_func_estimator,
         initial_params,
         args=(candidate_circuit, estimator, costHamil),
-        method="COBYLA",  # Using COBYLA for gradient free optimization also fast
+        method="L-BFGS-B",  # Using COBYLA for gradient free optimization also fast
         tol=1e-3,
         options={"maxiter": 1000},
     )
@@ -372,16 +372,16 @@ if __name__ == "__main__":
 
     # setting backend for sampling
     sampler = Sampler(mode=backend_simulator)
-    sampler.options.default_shots = 1000
+    sampler.options.default_shots = 10000
 
     # collecting distribution
     sampleResult = sampler.run([optimized_circuit]).result()
     dist = sampleResult[0].data.meas.get_counts()
     sortedDist = sorted(dist.items(), key=lambda item: item[1], reverse=True)
-    print("Distribution:", sortedDist)
+    print("Distribution:", sortedDist[0:5])  # print top 5 results
 
     # /// Saving results ///
-    output_filename_unique = f"{problemFileNameTag}result_instance_{instanceOfInterest}.json"  # CREATE A UNIQUE FILENAME FOR THIS JOB'S RESULT
+    output_filename_unique = f"{problemFileNameTag}{backend_simulator.name}_num_{instanceOfInterest}.json"  # CREATE A UNIQUE FILENAME FOR THIS JOB'S RESULT
 
     run_metadata = {"qaoaLayers": reps_p, "backend_name": backend_simulator.name}
     current_run_data = {
