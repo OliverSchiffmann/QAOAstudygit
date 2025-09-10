@@ -1,8 +1,6 @@
 import sys
 import argparse
 import os
-import uuid
-from filelock import FileLock
 import json
 import numpy as np
 from scipy.optimize import minimize
