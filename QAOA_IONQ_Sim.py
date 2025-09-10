@@ -1,4 +1,3 @@
-import sys
 import argparse
 import os
 import json
@@ -9,25 +8,21 @@ from itertools import combinations
 from config import problem_configs
 from dotenv import load_dotenv
 from requests.exceptions import ConnectionError
-from concurrent.futures import ThreadPoolExecutor, as_completed, ProcessPoolExecutor
+from concurrent.futures import as_completed, ProcessPoolExecutor
 
 
 # Packages for quantum stuff
 from qiskit.quantum_info import SparsePauliOp
 from qiskit.circuit import QuantumCircuit
 from qiskit.circuit.library import QAOAAnsatz
-from qiskit_aer import AerSimulator
+from qiskit.providers import JobStatus
 from qiskit_ibm_runtime import (
     EstimatorV2 as Estimator,
     QiskitRuntimeService,
     SamplerV2 as Sampler,
 )
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
-from qiskit_ibm_runtime.fake_provider import (
-    FakeBrisbane,
-    FakeSherbrooke,
-    FakeTorino,
-)
+
 from qiskit_ionq import IonQProvider
 
 load_dotenv()  # Load environment variables from .env file
@@ -49,9 +44,9 @@ class QAOACallback:
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                # --- This is the code that can fail ---
                 transpiledHamil = self.costHamiltonian.apply_layout(self.ansatz.layout)
                 pub = (self.ansatz, transpiledHamil, params)
+                # print(self.ansatz)
                 job = self.estimator.run([pub])
                 results = job.result()[0]
                 cost = results.data.evs
@@ -80,16 +75,13 @@ class QAOACallback:
 
     def cost_function_wrapper(
         self, params, instance_id
-    ):  # required because ionq cant handle 0.0 angle roation gates
-        """
-        A wrapper that clips parameters before calling the real cost function.
-        """
-        # Define the small non-zero value
+    ):  # required because ionq cant handle 0.0 angle roation gates, gateset=native should avoid this problem but just in case
         epsilon = 1e-9
-        # This replaces any value less than epsilon with epsilon.
-        clipped_params = np.clip(params, a_min=epsilon, a_max=None)
+        safe_params = np.copy(params)
+        # Find where parameters are exactly 0 and replace them with epsilon
+        safe_params[safe_params == 0] = epsilon
 
-        return self.cost_func_estimator(clipped_params, instance_id)
+        return self.cost_func_estimator(safe_params, instance_id)
 
 
 class NumpyArrayEncoder(json.JSONEncoder):
@@ -316,20 +308,6 @@ def create_inital_state(num_qubits, problem_type, weight_capacity=None):
         # starting with simplest obvious scenario, city 0 at time 0, city 1 at time 1, city 2 at time 2
         initial_circuit.x([0, 4, 8])
     elif problem_type == "Knapsack":
-
-        # slack_variable_encoding = f"{weight_capacity:0{3}b}"[::-1] # note this only works for knapsack problems with 3 slack variables
-        # # also note string is reversed to match openQAOA encoding of knapsack problem where leftmost slack variable represents 2^0 remaining capacity, next bit is 2^1, and rightmost slack bit is 2^2
-        # # this is backwards to normal binary encoding, switcheroo moment
-        # target_qubits = [
-        #     index for index, char in enumerate(slack_variable_encoding) if char == "0"
-        # ]
-        # if target_qubits:
-        #     initial_circuit.x(target_qubits)
-        # actually dont need the weight capacity if i want tos tart with a full sack because that is alwasy 000
-
-        # initial_circuit.h(
-        #     [3, 4, 5, 6, 7, 8]
-        # )  # creates the inital state encoding slack variables = weight capacity and even superposition over decision variables
         initial_circuit.x([3])
 
     elif problem_type == "MinimumVertexCover":
@@ -365,6 +343,7 @@ def runSingleSimulation(args):
     ionqApiToken = os.environ.get("IONQ_API_TOKEN")
     provider = IonQProvider(token=ionqApiToken)
     backendSimulator = provider.get_backend("ionq_simulator", gateset="native")
+    backendSimulator.options.ionq_compiler_synthesis = True
 
     # --- Training ---
     costHamil, numQubits, isingTerms, weightCapacity = load_ising_and_build_hamiltonian(
@@ -381,16 +360,8 @@ def runSingleSimulation(args):
     }
     circuit = QAOAAnsatz(**qaoaKwargs)
     circuit.measure_all()
-    pm = generate_preset_pass_manager(
-        optimization_level=1, backend=backendSimulator, layout_method="trivial"
-    )  # level 1 chosen as IonQ hardware has a highly connected topology and a rich native gate set, aggressive transpilation can sometimes be counterproductive
-    candidateCircuit = pm.run(circuit)
-
-    # epsilon = 1e-9
-    # initialBetas = np.linspace(np.pi, epsilon, reps_p, endpoint=False).tolist()
-    # initialGammas = np.linspace(epsilon, np.pi, reps_p, endpoint=False).tolist()
-    # initialParams = initialBetas + initialGammas
-    # paramBounds = [(epsilon, 2 * np.pi) for _ in range(len(initialParams))]
+    pm = generate_preset_pass_manager(optimization_level=1, backend=backendSimulator)
+    candidate_circuit = pm.run(circuit)
 
     initialBetas = np.linspace(np.pi, 0, reps_p, endpoint=False).tolist()
     initialGammas = np.linspace(0, np.pi, reps_p, endpoint=False).tolist()
@@ -400,22 +371,30 @@ def runSingleSimulation(args):
     estimator = Estimator(mode=backendSimulator)
 
     # Create an instance of our thread-safe callback handler
-    qaoaCallback = QAOACallback(candidateCircuit, estimator, costHamil)
+    qaoaCallback = QAOACallback(candidate_circuit, estimator, costHamil)
 
     trainResult = minimize(
-        qaoaCallback.cost_func_estimator,  # Pass the method from our class instance
+        qaoaCallback.cost_function_wrapper,
         initialParams,
-        instanceOfInterest,
-        method="COBYLA",  # chosen to work with bounds (COBYLA doesnt)
+        args=(instanceOfInterest,),
+        method="COBYLA",
         tol=1e-3,
-        options={"maxiter": 500},  # You can increase this for real runs
+        options={"maxiter": 500},
     )
     # --- Sampling ---
-    optimizedCircuit = candidateCircuit.assign_parameters(trainResult.x)
-    sampler = Sampler(mode=backendSimulator)
-    sampler.options.default_shots = 10000
-    sampleResult = sampler.run([optimizedCircuit]).result()
-    dist = sampleResult[0].data.meas.get_counts()
+    optimizedCircuit = candidate_circuit.assign_parameters(trainResult.x)
+    job = backendSimulator.run(optimizedCircuit, shots=10000)
+    job_id = job.job_id()
+
+    print(f"(Instance: {instanceOfInterest}) Submitted sampling job with ID: {job_id}")
+
+    while job.status() in [JobStatus.QUEUED, JobStatus.INITIALIZING, JobStatus.RUNNING]:
+        time.sleep(2)
+    print(f"(Instance: {instanceOfInterest}) Final job status: {job.status().name}")
+
+    if job.status() == JobStatus.DONE:
+        completeJob = backendSimulator.retrieve_job(job_id)
+        dist = completeJob.get_counts()
     sortedDist = sorted(dist.items(), key=lambda item: item[1], reverse=True)
 
     # --- Saving Results ---
@@ -439,9 +418,7 @@ def runSingleSimulation(args):
 
 
 if __name__ == "__main__":
-    problemTypeToRun = (
-        "MinimumVertexCover"  # options: 'TSP','Knapsack', 'MinimumVertexCover'
-    )
+    problemTypeToRun = "TSP"  # options: 'TSP','Knapsack', 'MinimumVertexCover'
     instancesToRun = range(1, 101)
     tasks = [(problemTypeToRun, i) for i in instancesToRun]
     maxWorkers = 100
