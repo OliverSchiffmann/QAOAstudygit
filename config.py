@@ -10,4 +10,5 @@ problem_configs = {
 provider_configs = {
     "IONQ": {"file_slug": "ionq_simulator"},
     "IBM": {"file_slug": "aer_simulator"},
+    "ALICEBOB": {"file_slug": "EMU:40Q:LOGICAL_NOISELESS"},
 }

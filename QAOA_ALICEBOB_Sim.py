@@ -1,87 +1,30 @@
+import sys
 import argparse
 import os
 import json
-import time
 import numpy as np
 from scipy.optimize import minimize
+import time
 from itertools import combinations
 from config import problem_configs
-from dotenv import load_dotenv
-from requests.exceptions import ConnectionError
-from concurrent.futures import as_completed, ProcessPoolExecutor
-
 
 # Packages for quantum stuff
 from qiskit.quantum_info import SparsePauliOp
 from qiskit.circuit import QuantumCircuit
 from qiskit.circuit.library import QAOAAnsatz
-from qiskit.providers import JobStatus
+from qiskit_aer import AerSimulator
 from qiskit_ibm_runtime import (
     EstimatorV2 as Estimator,
     QiskitRuntimeService,
     SamplerV2 as Sampler,
 )
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
-
-from qiskit_ionq import IonQProvider
-
-load_dotenv()  # Load environment variables from .env file
-
-
-# ////////// Classes ////////////
-class QAOACallback:
-    """A thread-safe class to hold the state of the optimization callback."""
-
-    def __init__(self, ansatz, estimator, costHamiltonian):
-        self.ansatz = ansatz
-        self.estimator = estimator
-        self.costHamiltonian = costHamiltonian
-        self.numOptimisations = 0
-        self.objectiveFuncVals = []
-
-    def cost_func_estimator(self, params, instance_id):
-        """A robust cost function that handles network errors."""
-        max_retries = 3
-        for attempt in range(max_retries):
-            try:
-                transpiledHamil = self.costHamiltonian.apply_layout(self.ansatz.layout)
-                pub = (self.ansatz, transpiledHamil, params)
-                # print(self.ansatz)
-                job = self.estimator.run([pub])
-                results = job.result()[0]
-                cost = results.data.evs
-                costFloat = float(np.real(cost))
-                self.objectiveFuncVals.append(costFloat)
-                self.numOptimisations += 1
-                print(
-                    f"(Instance: {instance_id}) Optimization step {self.numOptimisations}"
-                )
-                return costFloat
-
-            except ConnectionError as e:
-                print(f"Network error on attempt {attempt + 1}: {e}. Retrying...")
-                time.sleep(2)
-
-            except Exception as e:
-                # Catch any other potential errors from the job
-                print(f"An unexpected job error occurred: {e}. Penalizing this step.")
-                break
-
-        # If all retries fail, penalize this parameter set
-        print(
-            f"All network attempts failed for instance {instance_id}. Returning infinity."
-        )
-        return float("inf")
-
-    def cost_function_wrapper(
-        self, params, instance_id
-    ):  # required because ionq cant handle 0.0 angle roation gates, gateset=native should avoid this problem but just in case
-        epsilon = 1e-9
-        safe_params = np.copy(params)
-        # Find where parameters are exactly 0 and replace them with epsilon
-        safe_params[safe_params == 0] = epsilon
-
-        return self.cost_func_estimator(safe_params, instance_id)
+from qiskit_ibm_runtime.fake_provider import (
+    FakeBrisbane,
+    FakeSherbrooke,
+    FakeTorino,
+)
+from qiskit_alice_bob_provider import AliceBobLocalProvider
 
 
 class NumpyArrayEncoder(json.JSONEncoder):
@@ -116,9 +59,7 @@ def load_ising_and_build_hamiltonian(file_path, instance_id):
     terms = selected_ising_data["terms"]
     weights = selected_ising_data["weights"]
     problem_type = selected_ising_data.get("problem_type")
-    print(
-        f"(Instance: {instance_id}) Problem type found from ising data: {problem_type}"
-    )
+    print(f"problem type found from ising data: {problem_type}")
 
     pauli_list = []
     num_qubits = 0
@@ -146,6 +87,25 @@ def load_ising_and_build_hamiltonian(file_path, instance_id):
         weight_capacity = selected_ising_data.get("weight_capacity")
         return hamiltonian, num_qubits, terms, weight_capacity
     return hamiltonian, num_qubits, terms, None
+
+
+def cost_func_estimator(params, ansatz, estimator, pass_manager, cost_hamiltonian):
+    global numOptimisations
+    boundAnsatz = ansatz.assign_parameters(params)
+    transpiledAnsatz = pass_manager.run(boundAnsatz)
+    # transpiledHamil = cost_hamiltonian.apply_layout(transpiledAnsatz.layout)
+    pub = (transpiledAnsatz, cost_hamiltonian)
+    job = estimator.run([pub])
+    results = job.result()[0]
+    cost = results.data.evs
+
+    cost_float = float(np.real(cost))
+    objective_func_vals.append(cost_float)
+
+    numOptimisations = numOptimisations + 1
+    print(f"Optimization step {numOptimisations}, Cost: {cost_float}")
+
+    return cost_float
 
 
 def save_single_result(folder_path, file_name, data):
@@ -203,9 +163,9 @@ def setup_configuration():
     return problem_type, instance_of_interest, ising_file_name, problem_file_name_tag
 
 
-def build_mixer_hamiltonian(num_qubits, problem_type, instance_id):
+def build_mixer_hamiltonian(num_qubits, problem_type):
     if problem_type == "TSP":
-        print(f"(Instance: {instance_id}) Building mixer Hamiltonian for TSP...")
+        print("Building mixer Hamiltonian for TSP...")
         if num_qubits != 9:
             raise ValueError("TSP mixer Hamiltonian only works for exactly 9 qubits.")
         # Each city must be visited once (rows in a 3x3 grid)
@@ -233,7 +193,7 @@ def build_mixer_hamiltonian(num_qubits, problem_type, instance_id):
         mixer_hamiltonian = SparsePauliOp.from_list(pauli_list)
         return mixer_hamiltonian
     elif problem_type == "Knapsack":
-        print(f"(Instance: {instance_id}) Building mixer Hamiltonian for Knapsack...")
+        print("Building mixer Hamiltonian for Knapsack...")
         pauli_list = []
         # Add standard X-mixer terms for all ITEM qubits (indices 3 to 8)
         item_indices = range(3, num_qubits)
@@ -252,9 +212,7 @@ def build_mixer_hamiltonian(num_qubits, problem_type, instance_id):
         mixer_hamiltonian = SparsePauliOp.from_list(pauli_list)
         return mixer_hamiltonian
     elif problem_type == "MinimumVertexCover":
-        print(
-            f"(Instance: {instance_id}) Building Mixer Hamiltonian for Minimum Vertex Cover..."
-        )
+        print("Building Mixer Hamiltonian for Minimum Vertex Cover...")
 
         # edges = []
         # for term in terms:
@@ -321,37 +279,45 @@ def create_inital_state(num_qubits, problem_type, weight_capacity=None):
     return initial_circuit
 
 
-def runSingleSimulation(args):
-    """
-    Runs the complete QAOA optimization for a single problem instance.
-    This function is designed to be called by a thread.
-    """
-    # Unpack the arguments for this specific run
-    problemType, instanceOfInterest = args
-    print(f"STARTING: {problemType} instance {instanceOfInterest}")
-
-    # --- Configuration for this instance ---
-    config = problem_configs[problemType]
-    problemFileNameTag = config["file_slug"]
-    isingFileName = f"isingBatches/batch_Ising_data_{problemFileNameTag}.json"
-
-    # --- Variables ---
+if __name__ == "__main__":
+    # //////////    Variables    //////////
+    FILEDIRECTORY = "isingBatches"
     INDIVIDUAL_RESULTS_FOLDER = "individual_results"
-    reps_p = 20  # Number of QAOA layers
+    reps_p = 2
+    provider = AliceBobLocalProvider()
+    backend_simulator = provider.get_backend("EMU:40Q:LOGICAL_NOISELESS")
 
-    # --- Backend Setup ---
-    ionqApiToken = os.environ.get("IONQ_API_TOKEN")
-    provider = IonQProvider(token=ionqApiToken)
-    backendSimulator = provider.get_backend("ionq_simulator", gateset="native")
-    backendSimulator.options.ionq_compiler_synthesis = True
+    # ////////////      Config.    ///////////
+    problemType, instanceOfInterest, isingFileName, problemFileNameTag = (
+        setup_configuration()
+    )
 
-    # --- Training ---
+    print(
+        f"Problem Type: {problemType}, Instance ID: {instanceOfInterest}, Ising model file name: {isingFileName}"
+    )
+
+    print(problemFileNameTag)
+
+    # /// training ///
+    # --- cost hamiltonian ---
     costHamil, numQubits, isingTerms, weightCapacity = load_ising_and_build_hamiltonian(
         isingFileName, instanceOfInterest
     )
-    mixerHamil = build_mixer_hamiltonian(numQubits, problemType, instanceOfInterest)
-    initialCircuit = create_inital_state(numQubits, problemType, weightCapacity)
+    print(f"Problem class is: {problemType}")
+    if problemType == "Knapsack":
+        print(f"Capacity of this knapsack is: {weightCapacity}")
 
+    print(f"Quadratic and linear terms of the Ising model are: {isingTerms}")
+
+    # --- mixer ---
+    mixerHamil = build_mixer_hamiltonian(numQubits, problemType)
+    print(mixerHamil)
+
+    # --- inital state ---
+    initialCircuit = create_inital_state(numQubits, problemType, weightCapacity)
+    print(initialCircuit)
+
+    # --- QAOA Ansatz ---
     qaoaKwargs = {
         "cost_operator": costHamil,
         "reps": reps_p,
@@ -360,87 +326,62 @@ def runSingleSimulation(args):
     }
     circuit = QAOAAnsatz(**qaoaKwargs)
     circuit.measure_all()
-    pm = generate_preset_pass_manager(
-        optimization_level=1, backend=backendSimulator
-    )  # level 1 as IONQ is fully connected and they recommend 0 or 1
-    candidate_circuit = pm.run(circuit)
 
-    initialBetas = np.linspace(np.pi, 0, reps_p, endpoint=False).tolist()
-    initialGammas = np.linspace(0, np.pi, reps_p, endpoint=False).tolist()
-    initialParams = initialBetas + initialGammas
+    passManager = generate_preset_pass_manager(
+        optimization_level=0,  # Start with lower optimization level
+        backend=backend_simulator,
+    )
+    estimator = Estimator(mode=backend_simulator)
+    # trying linear ramp schedule again in case
+    initial_betas = np.linspace(np.pi, 0, reps_p, endpoint=False).tolist()
+    initial_gammas = np.linspace(0, np.pi, reps_p, endpoint=False).tolist()
+    initial_params = initial_betas + initial_gammas
 
-    # --- Training Loop ---
-    estimator = Estimator(mode=backendSimulator)
-
-    # Create an instance of our thread-safe callback handler
-    qaoaCallback = QAOACallback(candidate_circuit, estimator, costHamil)
-
+    # starting training loop
+    objective_func_vals = []
+    numOptimisations = 0
     trainResult = minimize(
-        qaoaCallback.cost_function_wrapper,
-        initialParams,
-        args=(instanceOfInterest,),
-        method="COBYLA",
+        cost_func_estimator,
+        initial_params,
+        args=(circuit, estimator, passManager, costHamil),
+        method="COBYLA",  # Using COBYLA for gradient free optimization also fast
         tol=1e-3,
-        options={"maxiter": 500},
+        options={"maxiter": 5},
     )
-    # --- Sampling ---
-    optimizedCircuit = candidate_circuit.assign_parameters(trainResult.x)
-    job = backendSimulator.run(optimizedCircuit, shots=10000)
-    job_id = job.job_id()
+    print(trainResult.x, trainResult.fun, numOptimisations)
 
-    print(f"(Instance: {instanceOfInterest}) Submitted sampling job with ID: {job_id}")
+    finalBoundCircuit = circuit.assign_parameters(trainResult.x)
+    optimized_circuit = passManager.run(finalBoundCircuit)
 
-    while job.status() in [JobStatus.QUEUED, JobStatus.INITIALIZING, JobStatus.RUNNING]:
-        time.sleep(2)
-    print(f"(Instance: {instanceOfInterest}) Final job status: {job.status().name}")
+    # /// Sampling ///
+    # setting backend for sampling
+    sampler = Sampler(mode=backend_simulator)
+    sampler.options.default_shots = 10000
 
-    if job.status() == JobStatus.DONE:
-        completeJob = backendSimulator.retrieve_job(job_id)
-        dist = completeJob.get_counts()
+    # collecting distribution
+    sampleResult = sampler.run([optimized_circuit]).result()
+    dist = sampleResult[0].data.meas.get_counts()
     sortedDist = sorted(dist.items(), key=lambda item: item[1], reverse=True)
+    print("Distribution:", sortedDist[0:5])  # print top 5 results
 
-    # --- Saving Results ---
-    outputFilenameUnique = (
-        f"{problemFileNameTag}{backendSimulator.name}_num_{instanceOfInterest}.json"
-    )
-    runMetadata = {"qaoaLayers": reps_p, "backend_name": backendSimulator.name}
-    currentRunData = {
+    # /// Saving results ///
+    output_filename_unique = f"{problemFileNameTag}{backend_simulator.name}_num_{instanceOfInterest}.json"  # CREATE A UNIQUE FILENAME FOR THIS JOB'S RESULT
+
+    run_metadata = {"qaoaLayers": reps_p, "backend_name": backend_simulator.name}
+    current_run_data = {
         "instance_id": instanceOfInterest,
         "sampled_distribution": sortedDist,
-        "num_training_loops": qaoaCallback.numOptimisations,  # Get the count from the callback
+        "num_training_loops": numOptimisations,
         "final_training_cost": trainResult.fun,
         "optimal_params": trainResult.x,
     }
-    dataToSave = {"metadata": runMetadata, "result": currentRunData}
+
+    # Combine metadata and the result for this single run
+    data_to_save = {"metadata": run_metadata, "result": current_run_data}
+
+    # Call the new, simple save function
     save_single_result(
         folder_path=INDIVIDUAL_RESULTS_FOLDER,
-        file_name=outputFilenameUnique,
-        data=dataToSave,
+        file_name=output_filename_unique,
+        data=data_to_save,
     )
-
-
-if __name__ == "__main__":
-    problemTypeToRun = (
-        "MinimumVertexCover"  # options: 'TSP','Knapsack', 'MinimumVertexCover'
-    )
-    instancesToRun = range(1, 101)
-    tasks = [(problemTypeToRun, i) for i in instancesToRun]
-    maxWorkers = 100
-    print(f"Starting {len(tasks)} simulations using up to {maxWorkers} threads...")
-
-    with ProcessPoolExecutor(max_workers=maxWorkers) as executor:
-        # submit() returns a Future object for each task
-        futureToTask = {
-            executor.submit(runSingleSimulation, task): task for task in tasks
-        }
-
-        # as_completed() yields futures as they finish
-        for future in as_completed(futureToTask):
-            originalTask = futureToTask[future]
-            try:
-                # .result() will raise any exception that happened in the thread
-                result = future.result()
-                print(f"Task {originalTask} completed successfully.")
-            except Exception as exc:
-                # This block will now catch and print the error!
-                print(f"Task {originalTask} generated an exception: {exc}")
