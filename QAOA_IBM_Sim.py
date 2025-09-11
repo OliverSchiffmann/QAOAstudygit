@@ -263,20 +263,6 @@ def create_inital_state(num_qubits, problem_type, weight_capacity=None):
         # starting with simplest obvious scenario, city 0 at time 0, city 1 at time 1, city 2 at time 2
         initial_circuit.x([0, 4, 8])
     elif problem_type == "Knapsack":
-
-        # slack_variable_encoding = f"{weight_capacity:0{3}b}"[::-1] # note this only works for knapsack problems with 3 slack variables
-        # # also note string is reversed to match openQAOA encoding of knapsack problem where leftmost slack variable represents 2^0 remaining capacity, next bit is 2^1, and rightmost slack bit is 2^2
-        # # this is backwards to normal binary encoding, switcheroo moment
-        # target_qubits = [
-        #     index for index, char in enumerate(slack_variable_encoding) if char == "0"
-        # ]
-        # if target_qubits:
-        #     initial_circuit.x(target_qubits)
-        # actually dont need the weight capacity if i want tos tart with a full sack because that is alwasy 000
-
-        # initial_circuit.h(
-        #     [3, 4, 5, 6, 7, 8]
-        # )  # creates the inital state encoding slack variables = weight capacity and even superposition over decision variables
         initial_circuit.x([3])
 
     elif problem_type == "MinimumVertexCover":
@@ -358,9 +344,9 @@ if __name__ == "__main__":
         cost_func_estimator,
         initial_params,
         args=(candidate_circuit, estimator, costHamil),
-        method="L-BFGS-B",  # Using COBYLA for gradient free optimization also fast
+        method="COBYLA",  # Using COBYLA for gradient free optimization also fast
         tol=1e-3,
-        options={"maxiter": 1000},
+        options={"maxiter": 500},
     )
     print(trainResult.x, trainResult.fun, numOptimisations)
 

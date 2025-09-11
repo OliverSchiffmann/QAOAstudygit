@@ -360,7 +360,9 @@ def runSingleSimulation(args):
     }
     circuit = QAOAAnsatz(**qaoaKwargs)
     circuit.measure_all()
-    pm = generate_preset_pass_manager(optimization_level=1, backend=backendSimulator)
+    pm = generate_preset_pass_manager(
+        optimization_level=1, backend=backendSimulator
+    )  # level 1 as IONQ is fully connected and they recommend 0 or 1
     candidate_circuit = pm.run(circuit)
 
     initialBetas = np.linspace(np.pi, 0, reps_p, endpoint=False).tolist()

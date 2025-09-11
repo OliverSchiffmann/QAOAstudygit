@@ -6,3 +6,8 @@ problem_configs = {
     # Can easily add more problem classes here in the future
     # 'MaxCut': { ... }
 }
+
+provider_configs = {
+    "IONQ": {"file_slug": "ionq_simulator"},
+    "IBM": {"file_slug": "aer_simulator"},
+}
