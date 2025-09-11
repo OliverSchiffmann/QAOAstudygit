@@ -418,7 +418,7 @@ def runSingleSimulation(args):
 
 
 if __name__ == "__main__":
-    problemTypeToRun = "TSP"  # options: 'TSP','Knapsack', 'MinimumVertexCover'
+    problemTypeToRun = "Knapsack"  # options: 'TSP','Knapsack', 'MinimumVertexCover'
     instancesToRun = range(1, 101)
     tasks = [(problemTypeToRun, i) for i in instancesToRun]
     maxWorkers = 100
