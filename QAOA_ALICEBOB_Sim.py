@@ -346,7 +346,7 @@ if __name__ == "__main__":
         args=(circuit, estimator, passManager, costHamil),
         method="COBYLA",  # Using COBYLA for gradient free optimization also fast
         tol=1e-3,
-        options={"maxiter": 5},
+        options={"maxiter": 7},
     )
     print(trainResult.x, trainResult.fun, numOptimisations)
 
