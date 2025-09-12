@@ -1,6 +1,6 @@
 #!/bin/bash
  
-#SBATCH --job-name=QAOA_Knapsack_ALICEBOB
+#SBATCH --job-name=QAOA_TSP_ALICEBOB
 #SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --exclude=bp1-compute196,bp1-compute150
@@ -24,4 +24,4 @@ cd $HOME/qaoaSim
 source qiskitProviderVenv/bin/activate
 
 # Run the script passing in the task id and the QUBO file
-python QAOA_ALICEBOB_Sim.py --problem_type Knapsack --instance_id ${SLURM_ARRAY_TASK_ID}
+python QAOA_ALICEBOB_Sim.py --problem_type TSP --instance_id ${SLURM_ARRAY_TASK_ID}
