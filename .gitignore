@@ -3,6 +3,8 @@ IBMQpynbvenv
 classicalvenv
 qiskitQAOAvenv
 qiskitProviderVenv
+aliceBobVenv
+*.silf
 .env
 __pycache__/
 *.pyc

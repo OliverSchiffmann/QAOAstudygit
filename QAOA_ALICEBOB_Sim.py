@@ -1,10 +1,8 @@
-import sys
 import argparse
 import os
 import json
 import numpy as np
 from scipy.optimize import minimize
-import time
 from itertools import combinations
 from config import problem_configs
 
@@ -12,10 +10,8 @@ from config import problem_configs
 from qiskit.quantum_info import SparsePauliOp
 from qiskit.circuit import QuantumCircuit
 from qiskit.circuit.library import QAOAAnsatz
-from qiskit_aer import AerSimulator
 from qiskit_ibm_runtime import (
     EstimatorV2 as Estimator,
-    QiskitRuntimeService,
     SamplerV2 as Sampler,
 )
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
@@ -278,7 +274,7 @@ if __name__ == "__main__":
     # //////////    Variables    //////////
     FILEDIRECTORY = "isingBatches"
     INDIVIDUAL_RESULTS_FOLDER = "individual_results"
-    reps_p = 20
+    reps_p = 2
     provider = AliceBobLocalProvider()
     backend_simulator = provider.get_backend("EMU:40Q:LOGICAL_NOISELESS")
 
@@ -323,7 +319,7 @@ if __name__ == "__main__":
     circuit.measure_all()
 
     passManager = generate_preset_pass_manager(
-        optimization_level=3,  # Start with lower optimization level
+        optimization_level=0,  # Start with lower optimization level
         backend=backend_simulator,
     )
     estimator = Estimator(mode=backend_simulator)
@@ -341,7 +337,7 @@ if __name__ == "__main__":
         args=(circuit, estimator, passManager, costHamil),
         method="COBYLA",  # Using COBYLA for gradient free optimization also fast
         tol=1e-3,
-        options={"maxiter": 500},
+        options={"maxiter": 10},
     )
     print(trainResult.x, trainResult.fun, numOptimisations)
 
