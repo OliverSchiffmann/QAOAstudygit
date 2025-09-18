@@ -274,7 +274,7 @@ if __name__ == "__main__":
     # //////////    Variables    //////////
     FILEDIRECTORY = "isingBatches"
     INDIVIDUAL_RESULTS_FOLDER = "individual_results"
-    reps_p = 2
+    reps_p = 20
     provider = AliceBobLocalProvider()
     backend_simulator = provider.get_backend("EMU:40Q:LOGICAL_NOISELESS")
 
@@ -319,7 +319,7 @@ if __name__ == "__main__":
     circuit.measure_all()
 
     passManager = generate_preset_pass_manager(
-        optimization_level=0,  # Start with lower optimization level
+        optimization_level=3,  # Start with lower optimization level
         backend=backend_simulator,
     )
     estimator = Estimator(mode=backend_simulator)
@@ -337,7 +337,7 @@ if __name__ == "__main__":
         args=(circuit, estimator, passManager, costHamil),
         method="COBYLA",  # Using COBYLA for gradient free optimization also fast
         tol=1e-3,
-        options={"maxiter": 10},
+        options={"maxiter": 500},
     )
     print(trainResult.x, trainResult.fun, numOptimisations)
 

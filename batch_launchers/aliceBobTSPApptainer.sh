@@ -1,11 +1,11 @@
 #!/bin/bash
  
-#SBATCH --job-name=QAOA_Knapsack_ALICEBOB
+#SBATCH --job-name=QAOA_TSP_ALICEBOB
 #SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --exclude=bp1-compute196,bp1-compute150
 #SBATCH --ntasks-per-node=24
-#SBATCH --time=24:0:0
+#SBATCH --time=48:0:0
 #SBATCH --mem=100M
 #SBATCH --account=eeme036064
  
@@ -15,13 +15,10 @@
 #SBATCH --error=logs/job_%A_%a.err
 
 # Add the modules
-module add languages/python/3.12.3
+module load apptainer
  
-# cd to folder in you home dir
-cd $HOME/qaoaSim
- 
-# Activate the venv 
-source qiskitProviderVenv/bin/activate
+# cd to folder
+cd $HOME/qaoaSim/blueAppStuff
 
 # Run the script passing in the task id and the QUBO file
-python QAOA_ALICEBOB_Sim.py --problem_type Knapsack --instance_id ${SLURM_ARRAY_TASK_ID}
+apptainer run --env "PROBLEM_TYPE=TSP,INSTANCE_ID=${SLURM_ARRAY_TASK_ID}" test.silf
