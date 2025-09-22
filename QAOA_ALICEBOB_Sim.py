@@ -38,7 +38,7 @@ def load_ising_and_build_hamiltonian(file_path, instance_id):
     with open(file_path, "r") as f:
         all_isings_data = json.load(f)  # Assumes this loads a list of dicts
 
-    selected_ising_data = None
+    selected_ising_data = {}
     # Find the desired ising model within list
     for ising_instance in all_isings_data:
         if (
@@ -84,6 +84,7 @@ def cost_func_estimator(params, ansatz, estimator, pass_manager, cost_hamiltonia
     global numOptimisations
     boundAnsatz = ansatz.assign_parameters(params)
     transpiledAnsatz = pass_manager.run(boundAnsatz)
+    # print(transpiledAnsatz)
     # transpiledHamil = cost_hamiltonian.apply_layout(transpiledAnsatz.layout)
     pub = (transpiledAnsatz, cost_hamiltonian)
     job = estimator.run([pub])
@@ -274,9 +275,9 @@ if __name__ == "__main__":
     # //////////    Variables    //////////
     FILEDIRECTORY = "isingBatches"
     INDIVIDUAL_RESULTS_FOLDER = "individual_results"
-    reps_p = 20
+    reps_p = 2
     provider = AliceBobLocalProvider()
-    backend_simulator = provider.get_backend("EMU:40Q:LOGICAL_NOISELESS")
+    backend_simulator = provider.get_backend("EMU:40Q:LOGICAL_TARGET")
 
     # ////////////      Config.    ///////////
     problemType, instanceOfInterest, isingFileName, problemFileNameTag = (
@@ -318,6 +319,7 @@ if __name__ == "__main__":
     circuit = QAOAAnsatz(**qaoaKwargs)
     circuit.measure_all()
 
+    print("Generating pass manager...")
     passManager = generate_preset_pass_manager(
         optimization_level=3,  # Start with lower optimization level
         backend=backend_simulator,
@@ -331,13 +333,15 @@ if __name__ == "__main__":
     # starting training loop
     objective_func_vals = []
     numOptimisations = 0
+
+    print("Starting optimsation loop...")
     trainResult = minimize(
         cost_func_estimator,
         initial_params,
         args=(circuit, estimator, passManager, costHamil),
         method="COBYLA",  # Using COBYLA for gradient free optimization also fast
         tol=1e-3,
-        options={"maxiter": 500},
+        options={"maxiter": 10},
     )
     print(trainResult.x, trainResult.fun, numOptimisations)
 
@@ -347,10 +351,10 @@ if __name__ == "__main__":
     # /// Sampling ///
     # setting backend for sampling
     sampler = Sampler(mode=backend_simulator)
-    sampler.options.default_shots = 10000
+    # sampler.options.default_shots = 10000
 
     # collecting distribution
-    sampleResult = sampler.run([optimized_circuit]).result()
+    sampleResult = sampler.run([optimized_circuit], shots=10000).result()
     dist = sampleResult[0].data.meas.get_counts()
     sortedDist = sorted(dist.items(), key=lambda item: item[1], reverse=True)
     print("Distribution:", sortedDist[0:5])  # print top 5 results

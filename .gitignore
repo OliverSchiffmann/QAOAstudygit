@@ -4,6 +4,7 @@ classicalvenv
 qiskitQAOAvenv
 qiskitProviderVenv
 aliceBobVenv
+braketVenv
 *.silf
 .env
 __pycache__/

@@ -104,7 +104,7 @@ def load_ising_and_build_hamiltonian(file_path, instance_id):
     with open(file_path, "r") as f:
         all_isings_data = json.load(f)  # Assumes this loads a list of dicts
 
-    selected_ising_data = None
+    selected_ising_data = {}
     # Find the desired ising model within list
     for ising_instance in all_isings_data:
         if (
@@ -336,13 +336,18 @@ def runSingleSimulation(args):
     isingFileName = f"isingBatches/batch_Ising_data_{problemFileNameTag}.json"
 
     # --- Variables ---
-    INDIVIDUAL_RESULTS_FOLDER = "individual_results"
-    reps_p = 20  # Number of QAOA layers
+    INDIVIDUAL_RESULTS_FOLDER = "individual_results_test"
+    reps_p = 2  # Number of QAOA layers
 
     # --- Backend Setup ---
     ionqApiToken = os.environ.get("IONQ_API_TOKEN")
     provider = IonQProvider(token=ionqApiToken)
     backendSimulator = provider.get_backend("ionq_simulator", gateset="native")
+    ionqDevice = (
+        "aria-1"  # MUST COMMENT OUT TO ENABLE CORRECT FILENAMING IF USING NOISELESS
+    )
+    backendSimulator.set_options(noise_model=ionqDevice)  # for noisy simulation
+
     backendSimulator.options.ionq_compiler_synthesis = True
 
     # --- Training ---
@@ -400,9 +405,14 @@ def runSingleSimulation(args):
     sortedDist = sorted(dist.items(), key=lambda item: item[1], reverse=True)
 
     # --- Saving Results ---
-    outputFilenameUnique = (
-        f"{problemFileNameTag}{backendSimulator.name}_num_{instanceOfInterest}.json"
-    )
+    if ionqDevice:
+        outputFilenameUnique = (
+            f"{problemFileNameTag}{ionqDevice}_num_{instanceOfInterest}.json"
+        )
+    else:
+        outputFilenameUnique = (
+            f"{problemFileNameTag}{backendSimulator.name}_num_{instanceOfInterest}.json"
+        )
     runMetadata = {"qaoaLayers": reps_p, "backend_name": backendSimulator.name}
     currentRunData = {
         "instance_id": instanceOfInterest,
@@ -420,9 +430,7 @@ def runSingleSimulation(args):
 
 
 if __name__ == "__main__":
-    problemTypeToRun = (
-        "MinimumVertexCover"  # options: 'TSP','Knapsack', 'MinimumVertexCover'
-    )
+    problemTypeToRun = "Knapsack"  # options: 'TSP','Knapsack', 'MinimumVertexCover'
     instancesToRun = range(1, 101)
     tasks = [(problemTypeToRun, i) for i in instancesToRun]
     maxWorkers = 100
