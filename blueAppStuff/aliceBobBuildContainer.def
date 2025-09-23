@@ -2,5 +2,5 @@ Bootstrap: docker
 From: python:3.10
 
 %runscript
-    pip install -r aliceBobRequirements.txt
+    pip install -r aliceBobRequirements2.txt
     python QAOA_ALICEBOB_Sim.py --problem_type $PROBLEM_TYPE --instance_id $INSTANCE_ID

@@ -337,7 +337,7 @@ def runSingleSimulation(args):
 
     # --- Variables ---
     INDIVIDUAL_RESULTS_FOLDER = "individual_results_test"
-    reps_p = 2  # Number of QAOA layers
+    reps_p = 3  # Number of QAOA layers
 
     # --- Backend Setup ---
     ionqApiToken = os.environ.get("IONQ_API_TOKEN")
@@ -407,7 +407,7 @@ def runSingleSimulation(args):
     # --- Saving Results ---
     if ionqDevice:
         outputFilenameUnique = (
-            f"{problemFileNameTag}{ionqDevice}_num_{instanceOfInterest}.json"
+            f"{problemFileNameTag}{ionqDevice}_p{reps_p}_num_{instanceOfInterest}.json"
         )
     else:
         outputFilenameUnique = (
@@ -430,7 +430,9 @@ def runSingleSimulation(args):
 
 
 if __name__ == "__main__":
-    problemTypeToRun = "Knapsack"  # options: 'TSP','Knapsack', 'MinimumVertexCover'
+    problemTypeToRun = (
+        "MinimumVertexCover"  # options: 'TSP','Knapsack', 'MinimumVertexCover'
+    )
     instancesToRun = range(1, 101)
     tasks = [(problemTypeToRun, i) for i in instancesToRun]
     maxWorkers = 100

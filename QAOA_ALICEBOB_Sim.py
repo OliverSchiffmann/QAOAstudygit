@@ -277,7 +277,9 @@ if __name__ == "__main__":
     INDIVIDUAL_RESULTS_FOLDER = "individual_results"
     reps_p = 2
     provider = AliceBobLocalProvider()
-    backend_simulator = provider.get_backend("EMU:40Q:LOGICAL_TARGET")
+    backend_simulator = provider.get_backend(
+        "EMU:40Q:LOGICAL_NOISELESS"
+    )  # options are 'EMU:40Q:LOGICAL_NOISELESS',
 
     # ////////////      Config.    ///////////
     problemType, instanceOfInterest, isingFileName, problemFileNameTag = (
@@ -341,7 +343,7 @@ if __name__ == "__main__":
         args=(circuit, estimator, passManager, costHamil),
         method="COBYLA",  # Using COBYLA for gradient free optimization also fast
         tol=1e-3,
-        options={"maxiter": 10},
+        options={"maxiter": 500},
     )
     print(trainResult.x, trainResult.fun, numOptimisations)
 
@@ -360,7 +362,7 @@ if __name__ == "__main__":
     print("Distribution:", sortedDist[0:5])  # print top 5 results
 
     # /// Saving results ///
-    output_filename_unique = f"{problemFileNameTag}{backend_simulator.name}_num_{instanceOfInterest}.json"  # CREATE A UNIQUE FILENAME FOR THIS JOB'S RESULT
+    output_filename_unique = f"{problemFileNameTag}{backend_simulator.name}_{reps_p}_num_{instanceOfInterest}.json"  # CREATE A UNIQUE FILENAME FOR THIS JOB'S RESULT
 
     run_metadata = {"qaoaLayers": reps_p, "backend_name": backend_simulator.name}
     current_run_data = {

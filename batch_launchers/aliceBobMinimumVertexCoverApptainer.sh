@@ -4,9 +4,7 @@
 #SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --exclude=bp1-compute196,bp1-compute150
-#SBATCH --ntasks-per-node=24
-#SBATCH --time=48:0:0
-#SBATCH --mem=100M
+#SBATCH --time=60:0:0
 #SBATCH --account=eeme036064
  
 #SBATCH --array=1-100
@@ -21,4 +19,4 @@ module load apptainer
 cd $HOME/qaoaSim/blueAppStuff
 
 # Run the script passing in the task id and the QUBO file
-apptainer run --env "PROBLEM_TYPE=MinimumVertexCover,INSTANCE_ID=${SLURM_ARRAY_TASK_ID}" test.silf
+apptainer run --env "PROBLEM_TYPE=MinimumVertexCover,INSTANCE_ID=${SLURM_ARRAY_TASK_ID}" ALICEBOBSim.silf

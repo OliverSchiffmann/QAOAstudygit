@@ -101,6 +101,7 @@ def cost_func_estimator(params, ansatz, estimator, cost_hamiltonian):
     objective_func_vals.append(cost_float)
 
     numOptimisations = numOptimisations + 1
+    print(f"Optimization step {numOptimisations}, Cost: {cost_float}")
 
     return cost_float
 
@@ -279,10 +280,10 @@ def create_inital_state(num_qubits, problem_type, weight_capacity=None):
 if __name__ == "__main__":
     # //////////    Variables    //////////
     FILEDIRECTORY = "isingBatches"
-    INDIVIDUAL_RESULTS_FOLDER = "individual_results"
-    reps_p = 20
+    INDIVIDUAL_RESULTS_FOLDER = "individual_results_test"
+    reps_p = 2  # Number of QAOA layers
     backend_simulator = AerSimulator()
-    # backend_simulator = AerSimulator.from_backend(FakeTorino())
+    backend_simulator = AerSimulator.from_backend(FakeTorino())
 
     # ////////////      Config.    ///////////
     problemType, instanceOfInterest, isingFileName, problemFileNameTag = (
@@ -326,12 +327,7 @@ if __name__ == "__main__":
     pm = generate_preset_pass_manager(optimization_level=3, backend=backend_simulator)
     candidate_circuit = pm.run(circuit)
 
-    # creating random inital parameters
-    # num_params = 2 * reps_p
-    # initial_betas = (np.random.rand(reps_p) * np.pi).tolist()
-    # initial_gammas = (np.random.rand(reps_p) * (np.pi)).tolist()
-
-    # trying linear ramp schedule again in case
+    # linear ramp schedule
     initial_betas = np.linspace(np.pi, 0, reps_p, endpoint=False).tolist()
     initial_gammas = np.linspace(0, np.pi, reps_p, endpoint=False).tolist()
     initial_params = initial_betas + initial_gammas
@@ -365,7 +361,7 @@ if __name__ == "__main__":
     print("Distribution:", sortedDist[0:5])  # print top 5 results
 
     # /// Saving results ///
-    output_filename_unique = f"{problemFileNameTag}{backend_simulator.name}_num_{instanceOfInterest}.json"  # CREATE A UNIQUE FILENAME FOR THIS JOB'S RESULT
+    output_filename_unique = f"{problemFileNameTag}{backend_simulator.name}_p{reps_p}_num_{instanceOfInterest}.json"  # CREATE A UNIQUE FILENAME FOR THIS JOB'S RESULT
 
     run_metadata = {"qaoaLayers": reps_p, "backend_name": backend_simulator.name}
     current_run_data = {
