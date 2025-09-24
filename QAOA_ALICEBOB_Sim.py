@@ -135,9 +135,16 @@ def setup_configuration():
         required=True,
         help="The instance ID from the batch file to solve.",
     )
+    parser.add_argument(
+        "--num_layers",
+        type=int,
+        required=True,
+        help="The number of QAOA layers to build.",
+    )
     args = parser.parse_args()
     problem_type = args.problem_type
     instance_of_interest = args.instance_id
+    num_layers = args.num_layers
 
     # Select the configuration based on the determined problem_type
     try:
@@ -152,7 +159,13 @@ def setup_configuration():
     problem_file_name_tag = selectedConfig["file_slug"]
     ising_file_name = f"{FILEDIRECTORY}/batch_Ising_data_{problem_file_name_tag}.json"
 
-    return problem_type, instance_of_interest, ising_file_name, problem_file_name_tag
+    return (
+        problem_type,
+        instance_of_interest,
+        num_layers,
+        ising_file_name,
+        problem_file_name_tag,
+    )
 
 
 def build_mixer_hamiltonian(num_qubits, problem_type):
@@ -275,14 +288,14 @@ if __name__ == "__main__":
     # //////////    Variables    //////////
     FILEDIRECTORY = "isingBatches"
     INDIVIDUAL_RESULTS_FOLDER = "individual_results"
-    reps_p = 2
+    # reps_p = 1
     provider = AliceBobLocalProvider()
     backend_simulator = provider.get_backend(
-        "EMU:40Q:LOGICAL_NOISELESS"
-    )  # options are 'EMU:40Q:LOGICAL_NOISELESS',
+        "EMU:15Q:LOGICAL_EARLY"
+    )  # options are 'EMU:40Q:LOGICAL_NOISELESS', EMU:15Q:LOGICAL_EARLY
 
     # ////////////      Config.    ///////////
-    problemType, instanceOfInterest, isingFileName, problemFileNameTag = (
+    problemType, instanceOfInterest, reps_p, isingFileName, problemFileNameTag = (
         setup_configuration()
     )
 
