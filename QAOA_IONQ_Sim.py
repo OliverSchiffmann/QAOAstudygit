@@ -336,7 +336,7 @@ def runSingleSimulation(args):
     isingFileName = f"isingBatches/batch_Ising_data_{problemFileNameTag}.json"
 
     # --- Variables ---
-    INDIVIDUAL_RESULTS_FOLDER = "individual_results_test"
+    INDIVIDUAL_RESULTS_FOLDER = "individual_results_warehouse"
     reps_p = 3  # Number of QAOA layers
 
     # --- Backend Setup ---
@@ -430,9 +430,7 @@ def runSingleSimulation(args):
 
 
 if __name__ == "__main__":
-    problemTypeToRun = (
-        "MinimumVertexCover"  # options: 'TSP','Knapsack', 'MinimumVertexCover'
-    )
+    problemTypeToRun = "TSP"  # options: 'TSP','Knapsack', 'MinimumVertexCover'
     instancesToRun = range(1, 101)
     tasks = [(problemTypeToRun, i) for i in instancesToRun]
     maxWorkers = 100
