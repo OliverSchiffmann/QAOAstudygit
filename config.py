@@ -8,9 +8,9 @@ problem_configs = {
 }
 
 provider_configs = {
-    "IONQ": {"file_slug": "ionq_simulator"},
-    "IBM": {"file_slug": "aer_simulator_"},
-    "ALICEBOB": {"file_slug": "EMU:40Q:LOGICAL_NOISELESS"},
-    "IONQ_NOISY": {"file_slug": "aria-1"},
-    "IBM_NOISY": {"file_slug": "_aer_simulator_from(fake_torino)_"},
+    "IONQ_IDEAL": {"file_slug": "ionq_simulator_"},
+    "IBM_IDEAL": {"file_slug": "aer_simulator_"},
+    "IONQ_NOISY": {"file_slug": "aria-1_"},
+    "IBM_NOISY": {"file_slug": "aer_simulator_from(fake_torino)_"},
+    "ALICEBOB": {"file_slug": "EMU:40Q:LOGICAL_EARLY_"},
 }
