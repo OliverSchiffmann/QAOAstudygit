@@ -4,7 +4,7 @@
 #SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --exclude=bp1-compute196,bp1-compute150
-#SBATCH --ntasks-per-node=28
+#SBATCH --ntasks-per-node=24
 #SBATCH --time=24:0:0
 #SBATCH --account=eeme036064
  
