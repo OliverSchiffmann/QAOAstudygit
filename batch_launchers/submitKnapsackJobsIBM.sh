@@ -23,4 +23,4 @@ cd $HOME/qaoaSim
 source IBMQSimvenv/bin/activate
 
 # Run the script passing in the task id and the QUBO file
-python QAOA_IBM_Sim.py --problem_type Knapsack --instance_id ${SLURM_ARRAY_TASK_ID}
+python QAOA_IBM_Sim.py --problem_type Knapsack --instance_id ${SLURM_ARRAY_TASK_ID} --num_layers 1 --simulator IDEAL

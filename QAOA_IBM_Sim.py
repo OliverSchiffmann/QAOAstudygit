@@ -1,10 +1,8 @@
-import sys
 import argparse
 import os
 import json
 import numpy as np
 from scipy.optimize import minimize
-import time
 from itertools import combinations
 from config import problem_configs
 
@@ -15,13 +13,10 @@ from qiskit.circuit.library import QAOAAnsatz
 from qiskit_aer import AerSimulator
 from qiskit_ibm_runtime import (
     EstimatorV2 as Estimator,
-    QiskitRuntimeService,
     SamplerV2 as Sampler,
 )
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
 from qiskit_ibm_runtime.fake_provider import (
-    FakeBrisbane,
-    FakeSherbrooke,
     FakeTorino,
 )
 
@@ -46,7 +41,7 @@ def load_ising_and_build_hamiltonian(file_path, instance_id):
     with open(file_path, "r") as f:
         all_isings_data = json.load(f)  # Assumes this loads a list of dicts
 
-    selected_ising_data = None
+    selected_ising_data = {}
     # Find the desired ising model within list
     for ising_instance in all_isings_data:
         if (
@@ -141,9 +136,25 @@ def setup_configuration():
         required=True,
         help="The instance ID from the batch file to solve.",
     )
+    parser.add_argument(
+        "--num_layers",
+        type=int,
+        required=True,
+        help="The number of QAOA layers to build.",
+    )
+
+    parser.add_argument(
+        "--simulator",
+        type=str,
+        required=True,
+        help="The simulator to use.",
+    )
+
     args = parser.parse_args()
     problem_type = args.problem_type
     instance_of_interest = args.instance_id
+    num_layers = args.num_layers
+    simulator = args.simulator
 
     # Select the configuration based on the determined problem_type
     try:
@@ -158,7 +169,14 @@ def setup_configuration():
     problem_file_name_tag = selectedConfig["file_slug"]
     ising_file_name = f"{FILEDIRECTORY}/batch_Ising_data_{problem_file_name_tag}.json"
 
-    return problem_type, instance_of_interest, ising_file_name, problem_file_name_tag
+    return (
+        problem_type,
+        instance_of_interest,
+        num_layers,
+        ising_file_name,
+        problem_file_name_tag,
+        simulator,
+    )
 
 
 def build_mixer_hamiltonian(num_qubits, problem_type):
@@ -200,8 +218,10 @@ def build_mixer_hamiltonian(num_qubits, problem_type):
             x_pauli[i] = "X"
             pauli_list.append(("".join(x_pauli)[::-1], 1.0))
 
-        # Add X-mixer terms for ONLY the specified slack variables (only flipping first as most optimal knapsacks are first)
-        restricted_slack_indices = [0]
+        restricted_slack_indices = [
+            0,
+            1,
+        ]  # Add X-mixer terms for ONLY the specified slack variables
         for i in restricted_slack_indices:
             x_pauli = ["I"] * num_qubits
             x_pauli[i] = "X"
@@ -211,35 +231,6 @@ def build_mixer_hamiltonian(num_qubits, problem_type):
         return mixer_hamiltonian
     elif problem_type == "MinimumVertexCover":
         print("Building Mixer Hamiltonian for Minimum Vertex Cover...")
-
-        # edges = []
-        # for term in terms:
-        #     # A quadratic term (representing an edge in the original problem graph) is a list of two indices
-        #     if len(term) == 2:
-        #         edges.append(tuple(term))
-
-        # pauli_list = []
-
-        # for i in range(num_qubits):
-        #     x_pauli = ["I"] * num_qubits
-        #     x_pauli[i] = "X"
-        #     pauli_list.append(("".join(x_pauli)[::-1], 1.0))
-
-        # for qubit_pair in edges:
-        #     # Create the XX term
-        #     xx_pauli = ["I"] * num_qubits
-        #     xx_pauli[qubit_pair[0]] = "X"
-        #     xx_pauli[qubit_pair[1]] = "X"
-        #     pauli_list.append(("".join(xx_pauli)[::-1], 1.0))
-
-        #     # Create the YY term
-        #     yy_pauli = ["I"] * num_qubits
-        #     yy_pauli[qubit_pair[0]] = "Y"
-        #     yy_pauli[qubit_pair[1]] = "Y"
-        #     pauli_list.append(("".join(yy_pauli)[::-1], 1.0))
-
-        # mixer_hamiltonian = SparsePauliOp.from_list(pauli_list) # This was an attempt at an edge based mixer but ti didnt seem much better
-
         pauli_list = []
         for i in range(num_qubits):
             # Create an X operator on the i-th qubit
@@ -263,14 +254,17 @@ def create_inital_state(num_qubits, problem_type, weight_capacity=None):
     if problem_type == "TSP":
         # starting with simplest obvious scenario, city 0 at time 0, city 1 at time 1, city 2 at time 2
         initial_circuit.x([0, 4, 8])
+
     elif problem_type == "Knapsack":
-        initial_circuit.x([3])
+        initial_circuit.x(
+            [0, 1]
+        )  # empty knapsack with no items i guaranteed valid solution
 
     elif problem_type == "MinimumVertexCover":
         # initial_circuit.h(range(num_qubits))
         initial_circuit.x(
-            [0, 1, 2, 3, 4, 5, 6, 7]
-        )  # qubits take value 1 to represent node inclusion in set, last qubit (8) left as 0 to represent inital state with all but one node in the cover set
+            [0, 1, 2, 3]
+        )  # qubits take value 1 to represent node inclusion in set, include all nodes to ensure valid solution
     else:
         raise ValueError(f"Unknown problem_type: {problem_type}")
 
@@ -280,15 +274,26 @@ def create_inital_state(num_qubits, problem_type, weight_capacity=None):
 if __name__ == "__main__":
     # //////////    Variables    //////////
     FILEDIRECTORY = "isingBatches"
-    INDIVIDUAL_RESULTS_FOLDER = "individual_results_test"
-    reps_p = 2  # Number of QAOA layers
-    backend_simulator = AerSimulator()
-    backend_simulator = AerSimulator.from_backend(FakeTorino())
+    INDIVIDUAL_RESULTS_FOLDER = "individual_results_warehouse"
 
     # ////////////      Config.    ///////////
-    problemType, instanceOfInterest, isingFileName, problemFileNameTag = (
-        setup_configuration()
-    )
+    (
+        problemType,
+        instanceOfInterest,
+        reps_p,
+        isingFileName,
+        problemFileNameTag,
+        backend_identifier,
+    ) = setup_configuration()
+
+    if backend_identifier == "IDEAL":
+        backend_simulator = AerSimulator()
+        print(f"Backend: {backend_simulator.name}")
+    elif backend_identifier == "NOISY":
+        backend_simulator = AerSimulator.from_backend(FakeTorino())
+        print(f"Backend: {backend_simulator.name}")
+    else:
+        raise ValueError(f"Unknown backend identifier: {backend_identifier}")
 
     print(
         f"Problem Type: {problemType}, Instance ID: {instanceOfInterest}, Ising model file name: {isingFileName}"
@@ -352,10 +357,9 @@ if __name__ == "__main__":
 
     # setting backend for sampling
     sampler = Sampler(mode=backend_simulator)
-    sampler.options.default_shots = 10000
 
     # collecting distribution
-    sampleResult = sampler.run([optimized_circuit]).result()
+    sampleResult = sampler.run([optimized_circuit], shots=10000).result()
     dist = sampleResult[0].data.meas.get_counts()
     sortedDist = sorted(dist.items(), key=lambda item: item[1], reverse=True)
     print("Distribution:", sortedDist[0:5])  # print top 5 results

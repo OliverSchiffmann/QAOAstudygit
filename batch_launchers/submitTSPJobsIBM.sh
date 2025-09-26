@@ -22,5 +22,5 @@ cd $HOME/qaoaSim
 # Activate the venv 
 source IBMQSimvenv/bin/activate
 
-# Run the script passing in the task id and the QUBO file
-python QAOA_IBM_Sim.py --problem_type TSP --instance_id ${SLURM_ARRAY_TASK_ID}
+# Run the script passing in theproblem type taks id qaoa layers and simulator to use (NOISY or IDEAL)
+python QAOA_IBM_Sim.py --problem_type TSP --instance_id ${SLURM_ARRAY_TASK_ID} --num_layers 1 --simulator IDEAL

@@ -207,8 +207,10 @@ def build_mixer_hamiltonian(num_qubits, problem_type):
             x_pauli[i] = "X"
             pauli_list.append(("".join(x_pauli)[::-1], 1.0))
 
-        # Add X-mixer terms for ONLY the specified slack variables (only flipping first as most optimal knapsacks are first)
-        restricted_slack_indices = [0]
+        restricted_slack_indices = [
+            0,
+            1,
+        ]  # Add X-mixer terms for ONLY the specified slack variables
         for i in restricted_slack_indices:
             x_pauli = ["I"] * num_qubits
             x_pauli[i] = "X"
@@ -218,35 +220,6 @@ def build_mixer_hamiltonian(num_qubits, problem_type):
         return mixer_hamiltonian
     elif problem_type == "MinimumVertexCover":
         print("Building Mixer Hamiltonian for Minimum Vertex Cover...")
-
-        # edges = []
-        # for term in terms:
-        #     # A quadratic term (representing an edge in the original problem graph) is a list of two indices
-        #     if len(term) == 2:
-        #         edges.append(tuple(term))
-
-        # pauli_list = []
-
-        # for i in range(num_qubits):
-        #     x_pauli = ["I"] * num_qubits
-        #     x_pauli[i] = "X"
-        #     pauli_list.append(("".join(x_pauli)[::-1], 1.0))
-
-        # for qubit_pair in edges:
-        #     # Create the XX term
-        #     xx_pauli = ["I"] * num_qubits
-        #     xx_pauli[qubit_pair[0]] = "X"
-        #     xx_pauli[qubit_pair[1]] = "X"
-        #     pauli_list.append(("".join(xx_pauli)[::-1], 1.0))
-
-        #     # Create the YY term
-        #     yy_pauli = ["I"] * num_qubits
-        #     yy_pauli[qubit_pair[0]] = "Y"
-        #     yy_pauli[qubit_pair[1]] = "Y"
-        #     pauli_list.append(("".join(yy_pauli)[::-1], 1.0))
-
-        # mixer_hamiltonian = SparsePauliOp.from_list(pauli_list) # This was an attempt at an edge based mixer but ti didnt seem much better
-
         pauli_list = []
         for i in range(num_qubits):
             # Create an X operator on the i-th qubit
@@ -270,14 +243,17 @@ def create_inital_state(num_qubits, problem_type, weight_capacity=None):
     if problem_type == "TSP":
         # starting with simplest obvious scenario, city 0 at time 0, city 1 at time 1, city 2 at time 2
         initial_circuit.x([0, 4, 8])
+
     elif problem_type == "Knapsack":
-        initial_circuit.x([3])
+        initial_circuit.x(
+            [0, 1]
+        )  # empty knapsack with no items i guaranteed valid solution
 
     elif problem_type == "MinimumVertexCover":
         # initial_circuit.h(range(num_qubits))
         initial_circuit.x(
-            [0, 1, 2, 3, 4, 5, 6, 7]
-        )  # qubits take value 1 to represent node inclusion in set, last qubit (8) left as 0 to represent inital state with all but one node in the cover set
+            [0, 1, 2, 3]
+        )  # qubits take value 1 to represent node inclusion in set, include all nodes to ensure valid solution
     else:
         raise ValueError(f"Unknown problem_type: {problem_type}")
 
@@ -288,7 +264,6 @@ if __name__ == "__main__":
     # //////////    Variables    //////////
     FILEDIRECTORY = "isingBatches"
     INDIVIDUAL_RESULTS_FOLDER = "individual_results"
-    # reps_p = 1
     provider = AliceBobLocalProvider()
     backend_simulator = provider.get_backend(
         "EMU:15Q:LOGICAL_EARLY"

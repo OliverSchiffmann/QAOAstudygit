@@ -203,9 +203,9 @@ def setup_configuration():
     return problem_type, instance_of_interest, ising_file_name, problem_file_name_tag
 
 
-def build_mixer_hamiltonian(num_qubits, problem_type, instance_id):
+def build_mixer_hamiltonian(num_qubits, problem_type):
     if problem_type == "TSP":
-        print(f"(Instance: {instance_id}) Building mixer Hamiltonian for TSP...")
+        print("Building mixer Hamiltonian for TSP...")
         if num_qubits != 9:
             raise ValueError("TSP mixer Hamiltonian only works for exactly 9 qubits.")
         # Each city must be visited once (rows in a 3x3 grid)
@@ -233,7 +233,7 @@ def build_mixer_hamiltonian(num_qubits, problem_type, instance_id):
         mixer_hamiltonian = SparsePauliOp.from_list(pauli_list)
         return mixer_hamiltonian
     elif problem_type == "Knapsack":
-        print(f"(Instance: {instance_id}) Building mixer Hamiltonian for Knapsack...")
+        print("Building mixer Hamiltonian for Knapsack...")
         pauli_list = []
         # Add standard X-mixer terms for all ITEM qubits (indices 3 to 8)
         item_indices = range(3, num_qubits)
@@ -242,8 +242,10 @@ def build_mixer_hamiltonian(num_qubits, problem_type, instance_id):
             x_pauli[i] = "X"
             pauli_list.append(("".join(x_pauli)[::-1], 1.0))
 
-        # Add X-mixer terms for ONLY the specified slack variables (only flipping first as most optimal knapsacks are first)
-        restricted_slack_indices = [0]
+        restricted_slack_indices = [
+            0,
+            1,
+        ]  # Add X-mixer terms for ONLY the specified slack variables
         for i in restricted_slack_indices:
             x_pauli = ["I"] * num_qubits
             x_pauli[i] = "X"
@@ -252,38 +254,7 @@ def build_mixer_hamiltonian(num_qubits, problem_type, instance_id):
         mixer_hamiltonian = SparsePauliOp.from_list(pauli_list)
         return mixer_hamiltonian
     elif problem_type == "MinimumVertexCover":
-        print(
-            f"(Instance: {instance_id}) Building Mixer Hamiltonian for Minimum Vertex Cover..."
-        )
-
-        # edges = []
-        # for term in terms:
-        #     # A quadratic term (representing an edge in the original problem graph) is a list of two indices
-        #     if len(term) == 2:
-        #         edges.append(tuple(term))
-
-        # pauli_list = []
-
-        # for i in range(num_qubits):
-        #     x_pauli = ["I"] * num_qubits
-        #     x_pauli[i] = "X"
-        #     pauli_list.append(("".join(x_pauli)[::-1], 1.0))
-
-        # for qubit_pair in edges:
-        #     # Create the XX term
-        #     xx_pauli = ["I"] * num_qubits
-        #     xx_pauli[qubit_pair[0]] = "X"
-        #     xx_pauli[qubit_pair[1]] = "X"
-        #     pauli_list.append(("".join(xx_pauli)[::-1], 1.0))
-
-        #     # Create the YY term
-        #     yy_pauli = ["I"] * num_qubits
-        #     yy_pauli[qubit_pair[0]] = "Y"
-        #     yy_pauli[qubit_pair[1]] = "Y"
-        #     pauli_list.append(("".join(yy_pauli)[::-1], 1.0))
-
-        # mixer_hamiltonian = SparsePauliOp.from_list(pauli_list) # This was an attempt at an edge based mixer but ti didnt seem much better
-
+        print("Building Mixer Hamiltonian for Minimum Vertex Cover...")
         pauli_list = []
         for i in range(num_qubits):
             # Create an X operator on the i-th qubit
@@ -307,14 +278,17 @@ def create_inital_state(num_qubits, problem_type, weight_capacity=None):
     if problem_type == "TSP":
         # starting with simplest obvious scenario, city 0 at time 0, city 1 at time 1, city 2 at time 2
         initial_circuit.x([0, 4, 8])
+
     elif problem_type == "Knapsack":
-        initial_circuit.x([3])
+        initial_circuit.x(
+            [0, 1]
+        )  # empty knapsack with no items i guaranteed valid solution
 
     elif problem_type == "MinimumVertexCover":
         # initial_circuit.h(range(num_qubits))
         initial_circuit.x(
-            [0, 1, 2, 3, 4, 5, 6, 7]
-        )  # qubits take value 1 to represent node inclusion in set, last qubit (8) left as 0 to represent inital state with all but one node in the cover set
+            [0, 1, 2, 3]
+        )  # qubits take value 1 to represent node inclusion in set, include all nodes to ensure valid solution
     else:
         raise ValueError(f"Unknown problem_type: {problem_type}")
 
@@ -337,16 +311,19 @@ def runSingleSimulation(args):
 
     # --- Variables ---
     INDIVIDUAL_RESULTS_FOLDER = "individual_results_warehouse"
-    reps_p = 4  # Number of QAOA layers
+    reps_p = 20  # Number of QAOA layers
+    simType = "IDEAL"  # options: 'IDEAL','NOISY'
 
     # --- Backend Setup ---
     ionqApiToken = os.environ.get("IONQ_API_TOKEN")
     provider = IonQProvider(token=ionqApiToken)
     backendSimulator = provider.get_backend("ionq_simulator", gateset="native")
-    ionqDevice = (
-        "aria-1"  # MUST COMMENT OUT TO ENABLE CORRECT FILENAMING IF USING NOISELESS
-    )
-    backendSimulator.set_options(noise_model=ionqDevice)  # for noisy simulation
+
+    if simType == "NOISY":
+        ionqDevice = (
+            "aria-1"  # MUST COMMENT OUT TO ENABLE CORRECT FILENAMING IF USING NOISELESS
+        )
+        backendSimulator.set_options(noise_model=ionqDevice)  # for noisy simulation
 
     backendSimulator.options.ionq_compiler_synthesis = True
 
@@ -354,7 +331,7 @@ def runSingleSimulation(args):
     costHamil, numQubits, isingTerms, weightCapacity = load_ising_and_build_hamiltonian(
         isingFileName, instanceOfInterest
     )
-    mixerHamil = build_mixer_hamiltonian(numQubits, problemType, instanceOfInterest)
+    mixerHamil = build_mixer_hamiltonian(numQubits, problemType)
     initialCircuit = create_inital_state(numQubits, problemType, weightCapacity)
 
     qaoaKwargs = {
