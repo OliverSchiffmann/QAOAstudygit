@@ -319,10 +319,10 @@ def runSingleSimulation(args):
     provider = IonQProvider(token=ionqApiToken)
     backendSimulator = provider.get_backend("ionq_simulator", gateset="native")
 
+    ionqDevice = (
+        "aria-1"  # MUST COMMENT OUT TO ENABLE CORRECT FILENAMING IF USING NOISELESS
+    )
     if simType == "NOISY":
-        ionqDevice = (
-            "aria-1"  # MUST COMMENT OUT TO ENABLE CORRECT FILENAMING IF USING NOISELESS
-        )
         backendSimulator.set_options(noise_model=ionqDevice)  # for noisy simulation
 
     backendSimulator.options.ionq_compiler_synthesis = True
@@ -382,14 +382,13 @@ def runSingleSimulation(args):
     sortedDist = sorted(dist.items(), key=lambda item: item[1], reverse=True)
 
     # --- Saving Results ---
-    if ionqDevice:
+    if simType == "NOISY":
         outputFilenameUnique = (
             f"{problemFileNameTag}{ionqDevice}_p{reps_p}_num_{instanceOfInterest}.json"
         )
-    else:
-        outputFilenameUnique = (
-            f"{problemFileNameTag}{backendSimulator.name}_num_{instanceOfInterest}.json"
-        )
+    elif simType == "IDEAL":
+        outputFilenameUnique = f"{problemFileNameTag}{backendSimulator.name}_p{reps_p}_num_{instanceOfInterest}.json"
+
     runMetadata = {"qaoaLayers": reps_p, "backend_name": backendSimulator.name}
     currentRunData = {
         "instance_id": instanceOfInterest,
