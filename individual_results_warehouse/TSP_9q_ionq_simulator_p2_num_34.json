@@ -1,0 +1,23 @@
+{
+    "metadata": {
+        "qaoaLayers": 2,
+        "backend_name": "ionq_simulator"
+    },
+    "result": {
+        "instance_id": 34,
+        "sampled_distribution": [
+            [
+                "100010001",
+                10000
+            ]
+        ],
+        "num_training_loops": 31,
+        "final_training_cost": -99.0,
+        "optimal_params": [
+            3.1409316320787517,
+            1.571546693746421,
+            0.0,
+            1.5707963267948966
+        ]
+    }
+}
