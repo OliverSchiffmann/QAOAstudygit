@@ -350,7 +350,7 @@ if __name__ == "__main__":
     print("Distribution:", sortedDist[0:5])  # print top 5 results
 
     # /// Saving results ///
-    output_filename_unique = f"{problemFileNameTag}{backend_simulator.name}_{reps_p}_num_{instanceOfInterest}.json"  # CREATE A UNIQUE FILENAME FOR THIS JOB'S RESULT
+    output_filename_unique = f"{problemFileNameTag}{backend_simulator.name}_p{reps_p}_num_{instanceOfInterest}.json"  # CREATE A UNIQUE FILENAME FOR THIS JOB'S RESULT
 
     run_metadata = {"qaoaLayers": reps_p, "backend_name": backend_simulator.name}
     current_run_data = {

@@ -311,7 +311,7 @@ def runSingleSimulation(args):
 
     # --- Variables ---
     INDIVIDUAL_RESULTS_FOLDER = "individual_results_warehouse"
-    reps_p = 1  # Number of QAOA layers
+    reps_p = 4  # Number of QAOA layers
     simType = "NOISY"  # options: 'IDEAL','NOISY'
 
     # --- Backend Setup ---
@@ -406,7 +406,9 @@ def runSingleSimulation(args):
 
 
 if __name__ == "__main__":
-    problemTypeToRun = "Knapsack"  # options: 'TSP','Knapsack', 'MinimumVertexCover'
+    problemTypeToRun = (
+        "MinimumVertexCover"  # options: 'TSP','Knapsack', 'MinimumVertexCover'
+    )
     instancesToRun = range(1, 101)
     tasks = [(problemTypeToRun, i) for i in instancesToRun]
     maxWorkers = 100
