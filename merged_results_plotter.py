@@ -13,7 +13,7 @@ from helpers import calculate_ising_energy
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
 
-MERGED_RESULTS_DIR = "merged_results_warehouse"
+MERGED_RESULTS_DIR = "merged_results_warehouse_test"
 SUPPLEMENTARY_DATA_DIR = "isingBatches"
 
 

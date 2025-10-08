@@ -5,19 +5,21 @@ from config import problem_configs, provider_configs
 
 # Configuration
 SOURCE_DIR = "individual_results_warehouse"
-FINAL_OUTPUT_DIR = "merged_results_warehouse"
+FINAL_OUTPUT_DIR = "merged_results_warehouse_test"
 
 
 def merge_all_problem_classes():
     # 'None' is used as a placeholder for filenames that do not specify a depth.
-    qaoaDepths = [None, 1, 2, 3, 4]
+    qaoaDepths = [None, 1, 2, 3, 4, 20]
 
     for problemName, problemConfig in problem_configs.items():
         for providerName, providerConfig in provider_configs.items():
             for depth in qaoaDepths:
-                if depth is None:
+                if (
+                    depth is None
+                ):  # still needed as ideal tsp results for depth 20 use legacy naming convention
                     depthSlug = ""
-                    depthDescription = "default depth (20)"
+                    depthDescription = "legacy naming convention for p20"
                 else:
                     depthSlug = f"p{depth}_"
                     depthDescription = f"p={depth}"
@@ -58,6 +60,9 @@ def merge_all_problem_classes():
                 allResults.sort(key=lambda x: x["instance_id"])
 
                 finalData = {"metadata": metadata, "results": allResults}
+
+                if depth is None:
+                    depthSlug = "p20_"
 
                 finalOutputFilename = f"MERGED_results_{problemFileSlug}{providerFileSlug}{depthSlug}.json"
                 finalPath = os.path.join(FINAL_OUTPUT_DIR, finalOutputFilename)
