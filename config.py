@@ -3,6 +3,7 @@ problem_configs = {
     "TSP": {"file_slug": "TSP_9q_", "qubits": 9},
     "Knapsack": {"file_slug": "Knapsack_4_items_6q_", "qubits": 6, "items": 4},
     "MinimumVertexCover": {"file_slug": "MinimumVertexCover_4q_", "qubits": 4},
+    "MaxCut": {"file_slug": "MaxCut_4q_", "qubits": 4},
     # Can easily add more problem classes here in the future
     # 'MaxCut': { ... }
 }
