@@ -147,8 +147,8 @@ def build_mixer_hamiltonian(num_qubits, problem_type):
 
         mixer_hamiltonian = SparsePauliOp.from_list(pauli_list)
         return mixer_hamiltonian
-    elif problem_type == "MinimumVertexCover":
-        print("Building Mixer Hamiltonian for Minimum Vertex Cover...")
+    elif problem_type in ["MinimumVertexCover", "MaxCut"]:
+        print(f"Building standard X-mixer for {problem_type}...")
         pauli_list = []
         for i in range(num_qubits):
             # Create an X operator on the i-th qubit
@@ -183,6 +183,10 @@ def create_inital_state(num_qubits, problem_type, weight_capacity=None):
         initial_circuit.x(
             [0, 1, 2, 3]
         )  # qubits take value 1 to represent node inclusion in set, include all nodes to ensure valid solution
+    elif problem_type == "MaxCut":
+        initial_circuit.x(
+            [0]
+        )  # most obvious valid solution is 1000 since all nodes have an edge
     else:
         raise ValueError(f"Unknown problem_type: {problem_type}")
 

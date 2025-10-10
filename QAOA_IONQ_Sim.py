@@ -148,8 +148,8 @@ def runSingleSimulation(args):
 
     # --- Variables ---
     INDIVIDUAL_RESULTS_FOLDER = "individual_results_warehouse"
-    reps_p = 4  # Number of QAOA layers
-    simType = "NOISY"  # options: 'IDEAL','NOISY'
+    reps_p = 1  # Number of QAOA layers
+    simType = "IDEAL"  # options: 'IDEAL','NOISY'
 
     # --- Backend Setup ---
     ionqApiToken = os.environ.get("IONQ_API_TOKEN")
@@ -244,7 +244,7 @@ def runSingleSimulation(args):
 
 if __name__ == "__main__":
     problemTypeToRun = (
-        "MinimumVertexCover"  # options: 'TSP','Knapsack', 'MinimumVertexCover'
+        "MaxCut"  # options: 'TSP','Knapsack', 'MinimumVertexCover', 'MaxCut'
     )
     instancesToRun = range(1, 101)
     tasks = [(problemTypeToRun, i) for i in instancesToRun]

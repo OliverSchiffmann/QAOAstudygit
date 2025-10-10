@@ -1,0 +1,16 @@
+Bootstrap: docker
+From: python:3.10
+
+%files
+    # Copy local scripts into the root directory of the container
+    QAOA_ALICEBOB_Sim.py /
+    helpers.py /
+    config.py /
+    aliceBobRequirements2.txt /
+
+%runscript
+    pip install -r /aliceBobRequirements2.txt
+    python /QAOA_ALICEBOB_Sim.py \
+        --problem_type $PROBLEM_TYPE \
+        --instance_id $INSTANCE_ID \
+        --num_layers $NUM_LAYERS
