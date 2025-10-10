@@ -148,7 +148,7 @@ def runSingleSimulation(args):
 
     # --- Variables ---
     INDIVIDUAL_RESULTS_FOLDER = "individual_results_warehouse"
-    reps_p = 1  # Number of QAOA layers
+    reps_p = 3  # Number of QAOA layers
     simType = "IDEAL"  # options: 'IDEAL','NOISY'
 
     # --- Backend Setup ---
