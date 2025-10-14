@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=QAOA_MaxCut_ALICEBOB
+#SBATCH --job-name=QAOA_MVC_ALICEBOB
 #SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --exclude=bp1-compute196,bp1-compute150
@@ -42,4 +42,4 @@ module load apptainer
 # cd to folder in your home dir
 cd $HOME/qaoaSim/blueAppStuff
 
-apptainer run --env "PROBLEM_TYPE=MaxCut,INSTANCE_ID=${instanceId},NUM_LAYERS=${numLayers}" ALICEBOBSim.silf
+apptainer run --env "PROBLEM_TYPE=MinimumVertexCover,INSTANCE_ID=${instanceId},NUM_LAYERS=${numLayers}" ALICEBOBSim.silf
