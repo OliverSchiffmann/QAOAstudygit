@@ -148,17 +148,15 @@ def runSingleSimulation(args):
 
     # --- Variables ---
     INDIVIDUAL_RESULTS_FOLDER = "individual_results_warehouse"
-    reps_p = 3  # Number of QAOA layers
-    simType = "IDEAL"  # options: 'IDEAL','NOISY'
+    reps_p = 4  # Number of QAOA layers
+    simType = "NOISY"  # options: 'IDEAL','NOISY'
 
     # --- Backend Setup ---
     ionqApiToken = os.environ.get("IONQ_API_TOKEN")
     provider = IonQProvider(token=ionqApiToken)
     backendSimulator = provider.get_backend("ionq_simulator", gateset="native")
 
-    ionqDevice = (
-        "aria-1"  # MUST COMMENT OUT TO ENABLE CORRECT FILENAMING IF USING NOISELESS
-    )
+    ionqDevice = "aria-1"
     if simType == "NOISY":
         backendSimulator.set_options(noise_model=ionqDevice)  # for noisy simulation
 
