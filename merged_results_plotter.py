@@ -1,5 +1,5 @@
-# example usage for two plots \/
-# python merged_results_plotter.py --simulators IONQ_NOISY IBM_IDEAL --depths 2 -1 --plot_type barchart
+# example usage for IBM noisless plots \/
+# python merged_results_plotter.py --simulators IBM_IDEAL IBM_IDEAL IBM_IDEAL IBM_IDEAL IBM_IDEAL --depths 1 2 3 4 20 --plot_type barchart
 
 import json
 import os
