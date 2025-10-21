@@ -1,5 +1,6 @@
 # example usage for IBM noisless plots \/
 # python merged_results_plotter.py --simulators IBM_IDEAL IBM_IDEAL IBM_IDEAL IBM_IDEAL IBM_IDEAL --depths 1 2 3 4 20 --plot_type barchart
+# python merged_results_plotter.py --simulators IBM_NOISY IBM_NOISY IBM_NOISY IBM_NOISY --depths 1 2 3 4 --plot_type violin --instance_id 2
 
 import json
 import os
@@ -52,7 +53,7 @@ def preload_supplementary_data():
     return preloadedData
 
 
-def calculate_performance_scores(simulatorName, depth, preloadedData):
+def calculate_performance_scores(simulatorName, depth, preloadedData, instanceId):
     """
     Calculates the performance scores for all problem classes for a given
     simulator and depth.
@@ -68,7 +69,7 @@ def calculate_performance_scores(simulatorName, depth, preloadedData):
         # Construct the path to the merged results file
         mergedFilePath = os.path.join(
             MERGED_RESULTS_DIR,
-            f"MERGED_results_{problemFileSlug}{providerFileSlug}{depthSlug}inst_1.json",
+            f"MERGED_results_{problemFileSlug}{providerFileSlug}{depthSlug}inst_{instanceId}.json",
         )
 
         try:
@@ -76,7 +77,7 @@ def calculate_performance_scores(simulatorName, depth, preloadedData):
                 data = json.load(f)
         except FileNotFoundError:
             print(
-                f"WARNING: Results file not found for {problemName}, {simulatorName}, depth={depth}. Skipping."
+                f"WARNING: Results file not found for {problemName}, {simulatorName}, depth={depth}, instance={instanceId}. Skipping."
             )
             continue
 
@@ -84,30 +85,33 @@ def calculate_performance_scores(simulatorName, depth, preloadedData):
         solutionsData = preloadedData[problemName]["solutions"]
         isingModelsData = preloadedData[problemName]["ising_models"]
 
+        solutionInfo = solutionsData.get(instanceId)
+        isingModel = isingModelsData.get(instanceId)
+
+        # If we don't have the supplementary data for this instance, skip
+        if not solutionInfo or not isingModel:
+            print(
+                f"WARNING: No supplementary data for {problemName} instance {instanceId}. Skipping."
+            )
+            continue
+
+        # Pre-load solution details
+        optimumCost = solutionInfo["cost"]
+        maximumCost = solutionInfo["max_cost"]
+        isingTerms = isingModel["terms"]
+        isingWeights = isingModel["weights"]
+        energyRange = maximumCost - optimumCost
+
         for runInstance in data["results"]:
-            instanceId = runInstance["instance_id"]
-
-            # Get data from preloaded dictionaries
-            solutionInfo = solutionsData.get(instanceId)
-            isingModel = isingModelsData.get(instanceId)
-
-            if not solutionInfo or not isingModel:
-                continue
+            # 'runInstance' is one of the 100 repetitions
 
             mostProbableBitstring = runInstance["sampled_distribution"][0][0]
             mostProbableSolution = mostProbableBitstring[::-1]  # Reverse the bitstring
-
-            optimumCost = solutionInfo["cost"]
-            maximumCost = solutionInfo["max_cost"]
-
-            isingTerms = isingModel["terms"]
-            isingWeights = isingModel["weights"]
 
             mostProbableSolutionCost = calculate_ising_energy(
                 mostProbableSolution, isingTerms, isingWeights
             )
 
-            energyRange = maximumCost - optimumCost
             performance = 1 - (
                 (mostProbableSolutionCost - optimumCost) / energyRange
                 if energyRange != 0
@@ -118,7 +122,7 @@ def calculate_performance_scores(simulatorName, depth, preloadedData):
     return performanceScores
 
 
-def calculate_success_counts(simulatorName, depth, preloadedData):
+def calculate_success_counts(simulatorName, depth, preloadedData, instanceId):
     """
     Calculates the number of times QAOA found an optimal solution for each
     problem class.
@@ -131,7 +135,7 @@ def calculate_success_counts(simulatorName, depth, preloadedData):
         problemFileSlug = problemConfig["file_slug"]
         mergedFilePath = os.path.join(
             MERGED_RESULTS_DIR,
-            f"MERGED_results_{problemFileSlug}{providerFileSlug}{depthSlug}inst_1.json",
+            f"MERGED_results_{problemFileSlug}{providerFileSlug}{depthSlug}inst_{instanceId}.json",
         )
         try:
             with open(mergedFilePath, "r") as f:
@@ -142,21 +146,24 @@ def calculate_success_counts(simulatorName, depth, preloadedData):
 
         solutionsData = preloadedData[problemName]["solutions"]
 
-        for runInstance in data["results"]:
-            instanceId = runInstance["instance_id"]
-            solutionInfo = solutionsData.get(instanceId)
-            if not solutionInfo:
-                continue
+        solutionInfo = solutionsData.get(instanceId)
 
+        if not solutionInfo:
+            print(
+                f"WARNING: No solution data for {problemName} instance {instanceId}. Skipping."
+            )
+            continue
+
+        # Convert correct Ising solutions to binary strings for comparison
+        correctSolutionsIsing = solutionInfo["solutions"]
+        correctSolutionsBinary = [
+            s.replace("-1", "1").replace("+1", "0").replace(",", "")
+            for s in correctSolutionsIsing
+        ]
+
+        for runInstance in data["results"]:
             mostProbableBitstring = runInstance["sampled_distribution"][0][0]
             mostProbableSolution = mostProbableBitstring[::-1]
-
-            # Convert correct Ising solutions to binary strings for comparison
-            correctSolutionsIsing = solutionInfo["solutions"]
-            correctSolutionsBinary = [
-                s.replace("-1", "1").replace("+1", "0").replace(",", "")
-                for s in correctSolutionsIsing
-            ]
 
             if mostProbableSolution in correctSolutionsBinary:
                 successCounts[problemName] += 1
@@ -188,10 +195,18 @@ def main():
         help="Type of plot to generate: 'boxplot' for performance or 'barchart' for success counts.",
     )
 
+    parser.add_argument(
+        "--instance_id",
+        type=int,
+        default=1,
+        help="The specific problem instance ID to plot.",
+    )
+
     args = parser.parse_args()
     simulatorNames = args.simulators
     depths = [None if d == -1 else d for d in args.depths]
     plotType = args.plot_type
+    instanceIdToPlot = args.instance_id
 
     if len(simulatorNames) != len(depths):
         raise ValueError("The number of simulators must match the number of depths.")
@@ -207,7 +222,7 @@ def main():
         fig.suptitle("QAOA Performance Distribution by Problem Class", fontsize=16)
         yLabel = "Performance Score"
     else:  # barchart
-        fig.suptitle("QAOA Success Count by Problem Class", fontsize=16)
+        fig.suptitle("Result Variability for Single Instance", fontsize=16)
         yLabel = "Optimal Solutions Found"
 
     for i, (simName, depth) in enumerate(zip(simulatorNames, depths)):
@@ -228,7 +243,9 @@ def main():
 
         # --- Generate the selected plot type ---
         if plotType == "boxplot":
-            scores = calculate_performance_scores(simName, depth, preloadedData)
+            scores = calculate_performance_scores(
+                simName, depth, preloadedData, instanceIdToPlot
+            )
             plotData = [scores[problem] for problem in originalLabels]
             if any(len(d) > 0 for d in plotData):
                 ax.boxplot(plotData, labels=plotLabels, patch_artist=True)
@@ -238,7 +255,9 @@ def main():
                 ax.text(0.5, 0.5, "No data found", ha="center", va="center")
 
         elif plotType == "barchart":
-            counts = calculate_success_counts(simName, depth, preloadedData)
+            counts = calculate_success_counts(
+                simName, depth, preloadedData, instanceIdToPlot
+            )
             plotData = [counts[problem] for problem in originalLabels]
             if sum(plotData) > 0:
                 bars = ax.bar(plotLabels, plotData)
@@ -250,7 +269,9 @@ def main():
                 ax.text(0.5, 0.5, "No data found", ha="center", va="center")
 
         elif plotType == "violin":
-            scores = calculate_performance_scores(simName, depth, preloadedData)
+            scores = calculate_performance_scores(
+                simName, depth, preloadedData, instanceIdToPlot
+            )
             plotData = [scores[problem] for problem in originalLabels]
 
             # Filter out empty data arrays, as violinplot will error
