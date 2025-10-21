@@ -3,6 +3,7 @@ IBMQpynbvenv
 classicalvenv
 qiskitQAOAvenv
 qiskitProviderVenv
+plotLandscapeVenv
 aliceBobVenv
 braketVenv
 *.silf
