@@ -1,0 +1,2472 @@
+{
+    "metadata": {
+        "qaoaLayers": 1,
+        "backend_name": "aer_simulator"
+    },
+    "results": [
+        {
+            "instance_id": 1,
+            "repitition_id": 30,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 88,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 67,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 71,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 26,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9956
+                ],
+                [
+                    "001011",
+                    13
+                ],
+                [
+                    "000001",
+                    13
+                ],
+                [
+                    "010011",
+                    8
+                ],
+                [
+                    "000010",
+                    6
+                ],
+                [
+                    "100011",
+                    4
+                ]
+            ],
+            "num_training_loops": 23,
+            "final_training_cost": -6.47802734375,
+            "optimal_params": [
+                3.1738158966797005,
+                0.00022977791005175104
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 84,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 92,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 51,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 3,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9989
+                ],
+                [
+                    "100011",
+                    4
+                ],
+                [
+                    "010011",
+                    3
+                ],
+                [
+                    "001011",
+                    2
+                ],
+                [
+                    "000010",
+                    2
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.47216796875,
+            "optimal_params": [
+                3.157145000523896,
+                -0.002908892725992469
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 10,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 47,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9991
+                ],
+                [
+                    "010011",
+                    4
+                ],
+                [
+                    "100011",
+                    2
+                ],
+                [
+                    "000001",
+                    2
+                ],
+                [
+                    "001011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.493408203125,
+            "optimal_params": [
+                3.156657917152076,
+                -0.0008286706947224508
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 46,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9953
+                ],
+                [
+                    "000001",
+                    14
+                ],
+                [
+                    "001011",
+                    12
+                ],
+                [
+                    "100011",
+                    10
+                ],
+                [
+                    "010011",
+                    6
+                ],
+                [
+                    "000010",
+                    5
+                ]
+            ],
+            "num_training_loops": 23,
+            "final_training_cost": -6.48828125,
+            "optimal_params": [
+                3.173833227995635,
+                0.00013697571496996836
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 11,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 50,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 2,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 16,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 93,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 85,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 27,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9953
+                ],
+                [
+                    "010011",
+                    14
+                ],
+                [
+                    "001011",
+                    11
+                ],
+                [
+                    "000010",
+                    8
+                ],
+                [
+                    "000001",
+                    8
+                ],
+                [
+                    "100011",
+                    6
+                ]
+            ],
+            "num_training_loops": 21,
+            "final_training_cost": -6.462646484375,
+            "optimal_params": [
+                3.1096908134777537,
+                0.000758356425657668
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 100,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 70,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9999
+                ],
+                [
+                    "001011",
+                    1
+                ]
+            ],
+            "num_training_loops": 24,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.1343909568198076,
+                0.0007917824285772084
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 89,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9991
+                ],
+                [
+                    "000010",
+                    3
+                ],
+                [
+                    "000001",
+                    2
+                ],
+                [
+                    "001011",
+                    2
+                ],
+                [
+                    "010011",
+                    1
+                ],
+                [
+                    "100011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.1581530457553226,
+                -0.004259862070871725
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 66,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 31,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 82,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9995
+                ],
+                [
+                    "010011",
+                    1
+                ],
+                [
+                    "100011",
+                    1
+                ],
+                [
+                    "000010",
+                    1
+                ],
+                [
+                    "000001",
+                    1
+                ],
+                [
+                    "001011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.483154296875,
+            "optimal_params": [
+                3.1569454248667923,
+                -0.0009622325718729611
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 94,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 57,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9992
+                ],
+                [
+                    "010011",
+                    2
+                ],
+                [
+                    "100011",
+                    2
+                ],
+                [
+                    "000001",
+                    2
+                ],
+                [
+                    "000010",
+                    1
+                ],
+                [
+                    "001011",
+                    1
+                ]
+            ],
+            "num_training_loops": 24,
+            "final_training_cost": -6.5087890625,
+            "optimal_params": [
+                3.126938255008028,
+                0.0036655574847017916
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 5,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9982
+                ],
+                [
+                    "000010",
+                    6
+                ],
+                [
+                    "010011",
+                    4
+                ],
+                [
+                    "000001",
+                    4
+                ],
+                [
+                    "001011",
+                    2
+                ],
+                [
+                    "100011",
+                    2
+                ]
+            ],
+            "num_training_loops": 26,
+            "final_training_cost": -6.50439453125,
+            "optimal_params": [
+                3.1248255676874104,
+                0.004933310014921896
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 16,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9990
+                ],
+                [
+                    "000001",
+                    3
+                ],
+                [
+                    "001011",
+                    3
+                ],
+                [
+                    "010011",
+                    2
+                ],
+                [
+                    "100011",
+                    1
+                ],
+                [
+                    "000010",
+                    1
+                ]
+            ],
+            "num_training_loops": 25,
+            "final_training_cost": -6.49267578125,
+            "optimal_params": [
+                3.155075145371996,
+                -0.004129334885060893
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 41,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9949
+                ],
+                [
+                    "000001",
+                    14
+                ],
+                [
+                    "010011",
+                    11
+                ],
+                [
+                    "001011",
+                    9
+                ],
+                [
+                    "100011",
+                    9
+                ],
+                [
+                    "000010",
+                    8
+                ]
+            ],
+            "num_training_loops": 20,
+            "final_training_cost": -6.446533203125,
+            "optimal_params": [
+                3.1728123824239347,
+                0.0009995417232500023
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 36,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9999
+                ],
+                [
+                    "000010",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.1330722651528493,
+                0.00070632426040819
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 61,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 98,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 77,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 20,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 9,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 8,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 21,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 16,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 99,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9945
+                ],
+                [
+                    "001011",
+                    14
+                ],
+                [
+                    "100011",
+                    13
+                ],
+                [
+                    "010011",
+                    11
+                ],
+                [
+                    "000010",
+                    9
+                ],
+                [
+                    "000001",
+                    8
+                ]
+            ],
+            "num_training_loops": 21,
+            "final_training_cost": -6.4736328125,
+            "optimal_params": [
+                3.1098139312539312,
+                0.0008487948465681111
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 76,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9995
+                ],
+                [
+                    "000001",
+                    2
+                ],
+                [
+                    "010011",
+                    1
+                ],
+                [
+                    "001011",
+                    1
+                ],
+                [
+                    "000010",
+                    1
+                ]
+            ],
+            "num_training_loops": 23,
+            "final_training_cost": -6.50439453125,
+            "optimal_params": [
+                3.132969091088555,
+                -0.008587101370807591
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 60,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9987
+                ],
+                [
+                    "000010",
+                    5
+                ],
+                [
+                    "100011",
+                    3
+                ],
+                [
+                    "010011",
+                    2
+                ],
+                [
+                    "000001",
+                    2
+                ],
+                [
+                    "001011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.4794921875,
+            "optimal_params": [
+                3.156848691673152,
+                -0.0009294445137116345
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 37,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9955
+                ],
+                [
+                    "001011",
+                    14
+                ],
+                [
+                    "000001",
+                    10
+                ],
+                [
+                    "010011",
+                    9
+                ],
+                [
+                    "100011",
+                    7
+                ],
+                [
+                    "000010",
+                    5
+                ]
+            ],
+            "num_training_loops": 24,
+            "final_training_cost": -6.48388671875,
+            "optimal_params": [
+                3.169071487155628,
+                0.01789593516231875
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 40,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9985
+                ],
+                [
+                    "100011",
+                    5
+                ],
+                [
+                    "000001",
+                    5
+                ],
+                [
+                    "000010",
+                    2
+                ],
+                [
+                    "001011",
+                    2
+                ],
+                [
+                    "010011",
+                    1
+                ]
+            ],
+            "num_training_loops": 21,
+            "final_training_cost": -6.481689453125,
+            "optimal_params": [
+                3.1570679463593487,
+                -0.0029175196297004523
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 17,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9990
+                ],
+                [
+                    "000010",
+                    3
+                ],
+                [
+                    "010011",
+                    3
+                ],
+                [
+                    "000001",
+                    2
+                ],
+                [
+                    "001011",
+                    1
+                ],
+                [
+                    "100011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.48828125,
+            "optimal_params": [
+                3.12543452638473,
+                -0.0008460350957385585
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 56,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9995
+                ],
+                [
+                    "100011",
+                    2
+                ],
+                [
+                    "010011",
+                    1
+                ],
+                [
+                    "000001",
+                    1
+                ],
+                [
+                    "000010",
+                    1
+                ]
+            ],
+            "num_training_loops": 23,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.133251969856222,
+                -0.00836056231934817
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 4,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9982
+                ],
+                [
+                    "000001",
+                    6
+                ],
+                [
+                    "001011",
+                    5
+                ],
+                [
+                    "010011",
+                    3
+                ],
+                [
+                    "000010",
+                    2
+                ],
+                [
+                    "100011",
+                    2
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.50439453125,
+            "optimal_params": [
+                3.1569778167036393,
+                -0.0009708131993540597
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 95,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9992
+                ],
+                [
+                    "001011",
+                    3
+                ],
+                [
+                    "000010",
+                    2
+                ],
+                [
+                    "100011",
+                    2
+                ],
+                [
+                    "000001",
+                    1
+                ]
+            ],
+            "num_training_loops": 24,
+            "final_training_cost": -6.482421875,
+            "optimal_params": [
+                3.12822065821914,
+                0.00036863909364883124
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 83,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 43,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.497802734375,
+            "optimal_params": [
+                3.1462486811965156,
+                -0.0006616899126157494
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 14,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9990
+                ],
+                [
+                    "001011",
+                    4
+                ],
+                [
+                    "000010",
+                    3
+                ],
+                [
+                    "100011",
+                    2
+                ],
+                [
+                    "010011",
+                    1
+                ]
+            ],
+            "num_training_loops": 24,
+            "final_training_cost": -6.4970703125,
+            "optimal_params": [
+                3.124968098961654,
+                -2.9842006730792772e-05
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 7,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 55,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 19,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 79,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9991
+                ],
+                [
+                    "010011",
+                    4
+                ],
+                [
+                    "000010",
+                    3
+                ],
+                [
+                    "100011",
+                    1
+                ],
+                [
+                    "001011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.49560546875,
+            "optimal_params": [
+                3.1564822888566133,
+                0.0006776715348863813
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 96,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 80,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 20,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.142254314128321,
+                0.0009491242040223941
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 38,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9955
+                ],
+                [
+                    "100011",
+                    12
+                ],
+                [
+                    "000010",
+                    11
+                ],
+                [
+                    "001011",
+                    8
+                ],
+                [
+                    "000001",
+                    8
+                ],
+                [
+                    "010011",
+                    6
+                ]
+            ],
+            "num_training_loops": 24,
+            "final_training_cost": -6.450927734375,
+            "optimal_params": [
+                3.170052056027861,
+                0.002308402023472916
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 18,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9941
+                ],
+                [
+                    "000001",
+                    17
+                ],
+                [
+                    "010011",
+                    14
+                ],
+                [
+                    "001011",
+                    14
+                ],
+                [
+                    "100011",
+                    8
+                ],
+                [
+                    "000010",
+                    6
+                ]
+            ],
+            "num_training_loops": 21,
+            "final_training_cost": -6.453125,
+            "optimal_params": [
+                3.1098636972617917,
+                0.0008778387299883158
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 59,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 19,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 22,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9997
+                ],
+                [
+                    "100011",
+                    1
+                ],
+                [
+                    "000010",
+                    1
+                ],
+                [
+                    "001011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.1334630249737248,
+                0.0009483825393113051
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 75,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9989
+                ],
+                [
+                    "010011",
+                    3
+                ],
+                [
+                    "000010",
+                    3
+                ],
+                [
+                    "001011",
+                    3
+                ],
+                [
+                    "000001",
+                    1
+                ],
+                [
+                    "100011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.503662109375,
+            "optimal_params": [
+                3.1575275504363653,
+                -0.004857020184894584
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 63,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9992
+                ],
+                [
+                    "001011",
+                    4
+                ],
+                [
+                    "010011",
+                    2
+                ],
+                [
+                    "100011",
+                    1
+                ],
+                [
+                    "000001",
+                    1
+                ]
+            ],
+            "num_training_loops": 25,
+            "final_training_cost": -6.497802734375,
+            "optimal_params": [
+                3.126802333825125,
+                -0.007712757484556909
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 34,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 35,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9991
+                ],
+                [
+                    "000010",
+                    4
+                ],
+                [
+                    "100011",
+                    3
+                ],
+                [
+                    "000001",
+                    1
+                ],
+                [
+                    "001011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.471435546875,
+            "optimal_params": [
+                3.156845018615557,
+                -0.0009279780040368016
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 62,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 74,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 16,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 23,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 16,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 58,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9999
+                ],
+                [
+                    "001011",
+                    1
+                ]
+            ],
+            "num_training_loops": 23,
+            "final_training_cost": -6.502197265625,
+            "optimal_params": [
+                3.138212134701912,
+                -0.0008506508083520399
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 19,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 39,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9984
+                ],
+                [
+                    "010011",
+                    5
+                ],
+                [
+                    "000001",
+                    4
+                ],
+                [
+                    "001011",
+                    3
+                ],
+                [
+                    "100011",
+                    2
+                ],
+                [
+                    "000010",
+                    2
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.490478515625,
+            "optimal_params": [
+                3.1574199996366215,
+                -0.0009793140851294725
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 81,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9991
+                ],
+                [
+                    "100011",
+                    3
+                ],
+                [
+                    "010011",
+                    2
+                ],
+                [
+                    "000001",
+                    2
+                ],
+                [
+                    "001011",
+                    1
+                ],
+                [
+                    "000010",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.50439453125,
+            "optimal_params": [
+                3.156746078062149,
+                -0.0008818256753617187
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 78,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9996
+                ],
+                [
+                    "000010",
+                    2
+                ],
+                [
+                    "000001",
+                    1
+                ],
+                [
+                    "001011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.497802734375,
+            "optimal_params": [
+                3.133468635663498,
+                0.0009502402757181122
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 97,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 6,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 16,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 54,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9995
+                ],
+                [
+                    "100011",
+                    2
+                ],
+                [
+                    "010011",
+                    1
+                ],
+                [
+                    "001011",
+                    1
+                ],
+                [
+                    "000001",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.478759765625,
+            "optimal_params": [
+                3.1333717117427744,
+                0.0009127843434261894
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 15,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 17,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 42,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9998
+                ],
+                [
+                    "001011",
+                    1
+                ],
+                [
+                    "100011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.502197265625,
+            "optimal_params": [
+                3.134242681490161,
+                0.0008866047266854179
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 49,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9999
+                ],
+                [
+                    "000010",
+                    1
+                ]
+            ],
+            "num_training_loops": 24,
+            "final_training_cost": -6.497802734375,
+            "optimal_params": [
+                3.130484560066362,
+                -0.0007918956166213023
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 24,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 15,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 73,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9999
+                ],
+                [
+                    "000001",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.1333268988925207,
+                0.0008913810517396439
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 65,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9960
+                ],
+                [
+                    "010011",
+                    12
+                ],
+                [
+                    "000001",
+                    10
+                ],
+                [
+                    "000010",
+                    8
+                ],
+                [
+                    "001011",
+                    6
+                ],
+                [
+                    "100011",
+                    4
+                ]
+            ],
+            "num_training_loops": 23,
+            "final_training_cost": -6.47509765625,
+            "optimal_params": [
+                3.173839699305728,
+                -7.681041814703508e-05
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 32,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9997
+                ],
+                [
+                    "001011",
+                    2
+                ],
+                [
+                    "010011",
+                    1
+                ]
+            ],
+            "num_training_loops": 23,
+            "final_training_cost": -6.502197265625,
+            "optimal_params": [
+                3.1521962495860327,
+                0.007158509500348202
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 45,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9984
+                ],
+                [
+                    "000001",
+                    5
+                ],
+                [
+                    "100011",
+                    3
+                ],
+                [
+                    "001011",
+                    3
+                ],
+                [
+                    "000010",
+                    3
+                ],
+                [
+                    "010011",
+                    2
+                ]
+            ],
+            "num_training_loops": 23,
+            "final_training_cost": -6.49267578125,
+            "optimal_params": [
+                3.158407139503696,
+                0.0018958358081612651
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 12,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9949
+                ],
+                [
+                    "000001",
+                    17
+                ],
+                [
+                    "100011",
+                    11
+                ],
+                [
+                    "010011",
+                    10
+                ],
+                [
+                    "000010",
+                    7
+                ],
+                [
+                    "001011",
+                    6
+                ]
+            ],
+            "num_training_loops": 21,
+            "final_training_cost": -6.423095703125,
+            "optimal_params": [
+                3.1096624799399954,
+                0.0007330510255917173
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 1,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9986
+                ],
+                [
+                    "010011",
+                    5
+                ],
+                [
+                    "000001",
+                    4
+                ],
+                [
+                    "100011",
+                    3
+                ],
+                [
+                    "001011",
+                    2
+                ]
+            ],
+            "num_training_loops": 23,
+            "final_training_cost": -6.4677734375,
+            "optimal_params": [
+                3.1250485085597752,
+                0.00039391929857916764
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 53,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9996
+                ],
+                [
+                    "010011",
+                    3
+                ],
+                [
+                    "001011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.133442891184254,
+                0.0009414106807393138
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 28,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9995
+                ],
+                [
+                    "000001",
+                    2
+                ],
+                [
+                    "000010",
+                    1
+                ],
+                [
+                    "001011",
+                    1
+                ],
+                [
+                    "100011",
+                    1
+                ]
+            ],
+            "num_training_loops": 24,
+            "final_training_cost": -6.4853515625,
+            "optimal_params": [
+                3.130784953703919,
+                -0.007854512213707924
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 90,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9960
+                ],
+                [
+                    "010011",
+                    10
+                ],
+                [
+                    "000010",
+                    10
+                ],
+                [
+                    "100011",
+                    8
+                ],
+                [
+                    "000001",
+                    7
+                ],
+                [
+                    "001011",
+                    5
+                ]
+            ],
+            "num_training_loops": 25,
+            "final_training_cost": -6.480224609375,
+            "optimal_params": [
+                3.171177477999925,
+                0.002386452219463887
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 69,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 19,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 86,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9996
+                ],
+                [
+                    "001011",
+                    2
+                ],
+                [
+                    "000001",
+                    1
+                ],
+                [
+                    "000010",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.1337452405064705,
+                0.0009993903524713956
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 68,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 87,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9998
+                ],
+                [
+                    "100011",
+                    1
+                ],
+                [
+                    "000010",
+                    1
+                ]
+            ],
+            "num_training_loops": 24,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.1347445183934215,
+                0.0002645761242496504
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 91,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9947
+                ],
+                [
+                    "000010",
+                    15
+                ],
+                [
+                    "010011",
+                    10
+                ],
+                [
+                    "001011",
+                    10
+                ],
+                [
+                    "100011",
+                    10
+                ],
+                [
+                    "000001",
+                    8
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.412841796875,
+            "optimal_params": [
+                3.1091746533974116,
+                -0.03148758426794434
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 29,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 52,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 13,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9988
+                ],
+                [
+                    "001011",
+                    4
+                ],
+                [
+                    "000001",
+                    4
+                ],
+                [
+                    "100011",
+                    2
+                ],
+                [
+                    "000010",
+                    2
+                ]
+            ],
+            "num_training_loops": 24,
+            "final_training_cost": -6.497802734375,
+            "optimal_params": [
+                3.129478797996743,
+                0.000918635711444183
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 44,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 33,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9996
+                ],
+                [
+                    "000010",
+                    1
+                ],
+                [
+                    "010011",
+                    1
+                ],
+                [
+                    "000001",
+                    1
+                ],
+                [
+                    "100011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.497802734375,
+            "optimal_params": [
+                3.1336372759581375,
+                0.002916509638909026
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 64,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9995
+                ],
+                [
+                    "000001",
+                    2
+                ],
+                [
+                    "100011",
+                    1
+                ],
+                [
+                    "001011",
+                    1
+                ],
+                [
+                    "010011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.1337715295000446,
+                0.0009999628118465237
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 72,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9986
+                ],
+                [
+                    "001011",
+                    6
+                ],
+                [
+                    "000010",
+                    3
+                ],
+                [
+                    "000001",
+                    2
+                ],
+                [
+                    "010011",
+                    2
+                ],
+                [
+                    "100011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.490478515625,
+            "optimal_params": [
+                3.156834367614177,
+                -0.0009236297206650294
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 25,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    9988
+                ],
+                [
+                    "000010",
+                    4
+                ],
+                [
+                    "000001",
+                    4
+                ],
+                [
+                    "010011",
+                    3
+                ],
+                [
+                    "100011",
+                    1
+                ]
+            ],
+            "num_training_loops": 22,
+            "final_training_cost": -6.49267578125,
+            "optimal_params": [
+                3.156260332792881,
+                -0.00028902749315496697
+            ]
+        },
+        {
+            "instance_id": 1,
+            "repitition_id": 48,
+            "sampled_distribution": [
+                [
+                    "000011",
+                    10000
+                ]
+            ],
+            "num_training_loops": 18,
+            "final_training_cost": -6.5,
+            "optimal_params": [
+                3.141592653589793,
+                0.0
+            ]
+        }
+    ]
+}

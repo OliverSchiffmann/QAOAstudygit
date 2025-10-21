@@ -1,0 +1,62 @@
+{
+    "metadata": {
+        "qaoaLayers": 1,
+        "backend_name": "aer_simulator_from(fake_torino)"
+    },
+    "result": {
+        "instance_id": 1,
+        "repitition_id": 35,
+        "sampled_distribution": [
+            [
+                "1111",
+                8957
+            ],
+            [
+                "1011",
+                354
+            ],
+            [
+                "0111",
+                286
+            ],
+            [
+                "1101",
+                178
+            ],
+            [
+                "1110",
+                107
+            ],
+            [
+                "0011",
+                40
+            ],
+            [
+                "1001",
+                26
+            ],
+            [
+                "0101",
+                24
+            ],
+            [
+                "0110",
+                20
+            ],
+            [
+                "1010",
+                6
+            ],
+            [
+                "1100",
+                2
+            ]
+        ],
+        "num_training_loops": 24,
+        "final_training_cost": -7.9990234375,
+        "optimal_params": [
+            3.2157950958401353,
+            0.0270870299719764
+        ]
+    }
+}

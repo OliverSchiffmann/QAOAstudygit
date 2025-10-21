@@ -184,7 +184,7 @@ def main():
         "--plot_type",
         type=str,
         default="boxplot",
-        choices=["boxplot", "barchart"],
+        choices=["boxplot", "barchart", "violin"],
         help="Type of plot to generate: 'boxplot' for performance or 'barchart' for success counts.",
     )
 
@@ -246,6 +246,33 @@ def main():
                 ax.grid(axis="y", linestyle="--", alpha=0.7)
                 # Add count labels on top of each bar
                 ax.bar_label(bars, padding=3)
+            else:
+                ax.text(0.5, 0.5, "No data found", ha="center", va="center")
+
+        elif plotType == "violin":
+            scores = calculate_performance_scores(simName, depth, preloadedData)
+            plotData = [scores[problem] for problem in originalLabels]
+
+            # Filter out empty data arrays, as violinplot will error
+            filteredPlotData = []
+            filteredLabels = []
+            for label, data in zip(plotLabels, plotData):
+                if len(data) > 0:
+                    filteredPlotData.append(data)
+                    filteredLabels.append(label)
+
+            if filteredPlotData:  # Check if we have any data left to plot
+                # Plot the violins
+                parts = ax.violinplot(
+                    filteredPlotData, showmeans=False, showmedians=True
+                )
+
+                # Set x-axis labels manually
+                ax.set_xticks(np.arange(1, len(filteredLabels) + 1))
+                ax.set_xticklabels(filteredLabels)
+
+                ax.set_ylim(0.4, 1.1)
+                ax.grid(axis="y", linestyle="--", alpha=0.7)
             else:
                 ax.text(0.5, 0.5, "No data found", ha="center", va="center")
 
