@@ -1,0 +1,38 @@
+{
+    "metadata": {
+        "qaoaLayers": 1,
+        "backend_name": "aer_simulator"
+    },
+    "result": {
+        "instance_id": 2,
+        "repitition_id": 55,
+        "sampled_distribution": [
+            [
+                "000011",
+                9995
+            ],
+            [
+                "100011",
+                2
+            ],
+            [
+                "000010",
+                1
+            ],
+            [
+                "010011",
+                1
+            ],
+            [
+                "001011",
+                1
+            ]
+        ],
+        "num_training_loops": 26,
+        "final_training_cost": -37.49560546875,
+        "optimal_params": [
+            3.1324937894253453,
+            -0.0007320415911051872
+        ]
+    }
+}

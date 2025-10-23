@@ -1,5 +1,10 @@
 # example usage for IBM noisless plots \/
 # python merged_results_plotter.py --simulators IBM_IDEAL IBM_IDEAL IBM_IDEAL IBM_IDEAL IBM_IDEAL --depths 1 2 3 4 20 --plot_type barchart
+# python merged_results_plotter.py --simulators IBM_NOISY IBM_NOISY IBM_NOISY IBM_NOISY --depths 1 2 3 4 --plot_type boxplot
+# python merged_results_plotter.py --simulators IONQ_IDEAL IONQ_IDEAL IONQ_IDEAL IONQ_IDEAL IONQ_IDEAL --depths 1 2 3 4 20 --plot_type boxplot
+# python merged_results_plotter.py --simulators IONQ_NOISY IONQ_NOISY IONQ_NOISY IONQ_NOISY --depths 1 2 3 4 --plot_type boxplot
+# python merged_results_plotter.py --simulators IBM_IDEAL IBM_NOISY IONQ_IDEAL IONQ_NOISY --depths 4 4 4 4 --plot_type boxplot
+# python merged_results_plotter.py --simulators ALICEBOB ALICEBOB ALICEBOB ALICEBOB --depths 1 2 3 4 --plot_type boxplot
 
 import json
 import os
@@ -232,7 +237,7 @@ def main():
             plotData = [scores[problem] for problem in originalLabels]
             if any(len(d) > 0 for d in plotData):
                 ax.boxplot(plotData, labels=plotLabels, patch_artist=True)
-                ax.set_ylim(0.4, 1.1)
+                ax.set_ylim(-0.1, 1.1)
                 ax.grid(axis="y", linestyle="--", alpha=0.7)
             else:
                 ax.text(0.5, 0.5, "No data found", ha="center", va="center")

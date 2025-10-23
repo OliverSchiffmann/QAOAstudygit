@@ -11,7 +11,7 @@ FINAL_OUTPUT_DIR = "merged_repeat_instance_results"
 def merge_all_problem_classes():
     # 'None' is used as a placeholder for filenames that do not specify a depth.
     qaoaDepths = [None, 1, 2, 3, 4, 20]
-    problem_instance_id = 1
+    problem_instance_id = 2
 
     for problemName, problemConfig in problem_configs.items():
         for providerName, providerConfig in provider_configs.items():
