@@ -129,8 +129,8 @@ def build_mixer_hamiltonian(num_qubits, problem_type):
     elif problem_type == "Knapsack":
         print("Building mixer Hamiltonian for Knapsack...")
         pauli_list = []
-        # Add standard X-mixer terms for all ITEM qubits (indices 3 to 8)
-        item_indices = range(3, num_qubits)
+        # Add standard X-mixer terms for all ITEM qubits (indices 2 to 5 for 6 qubits)
+        item_indices = range(2, num_qubits)
         for i in item_indices:
             x_pauli = ["I"] * num_qubits
             x_pauli[i] = "X"
