@@ -128,6 +128,7 @@ def build_mixer_hamiltonian(num_qubits, problem_type):
         return mixer_hamiltonian
     elif problem_type == "Knapsack":
         print("Building mixer Hamiltonian for Knapsack...")
+        # split up mixer creation across slack and item variables just for readability
         pauli_list = []
         # Add standard X-mixer terms for all ITEM qubits (indices 2 to 5 for 6 qubits)
         item_indices = range(2, num_qubits)

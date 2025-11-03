@@ -13,7 +13,7 @@
             ]
         ],
         "num_training_loops": 20,
-        "final_training_cost": -94.996337890625,
+        "final_training_cost": -95.0,
         "optimal_params": [
             3.142592653589793,
             0.0

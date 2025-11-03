@@ -9,11 +9,7 @@
         "sampled_distribution": [
             [
                 "100010001",
-                9999
-            ],
-            [
-                "001010001",
-                1
+                10000
             ]
         ],
         "num_training_loops": 20,

@@ -11,7 +11,7 @@ FINAL_OUTPUT_DIR = "merged_results_warehouse_test"
 def merge_all_problem_classes():
     # 'None' is used as a placeholder for filenames that do not specify a depth.
     qaoaDepths = [None, 1, 2, 3, 4, 20]
-
+    missingFilesLog = []
     for problemName, problemConfig in problem_configs.items():
         for providerName, providerConfig in provider_configs.items():
             for depth in qaoaDepths:
@@ -37,13 +37,15 @@ def merge_all_problem_classes():
                     f"{problemFileSlug}{providerFileSlug}{depthSlug}num_*.json",
                 )
                 individualFiles = glob.glob(searchPattern)
-                if not individualFiles:
-                    print(
-                        f"No result files found for pattern: {searchPattern}. Skipping.\n"
-                    )
-                    continue
 
                 print(f"Found {len(individualFiles)} result files to merge.")
+                if len(individualFiles) < 100 or individualFiles is None:
+                    missingFilesLog.append(
+                        f"{problemName}, {providerName}, {depthDescription}: Only found {len(individualFiles)} files."
+                    )
+
+                if not individualFiles:
+                    continue
 
                 allResults = []
                 metadata = {}
@@ -75,6 +77,10 @@ def merge_all_problem_classes():
                 print(
                     f"Successfully merged {len(allResults)} results into {finalPath}\n"
                 )
+
+    print("Missing Files Log:")
+    for logEntry in missingFilesLog:
+        print(logEntry)
 
 
 if __name__ == "__main__":

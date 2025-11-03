@@ -277,7 +277,7 @@ def plotSolutionData(allSolutionData, plotType="scatter"):
     # ax.set_title("Performance Score by Problem")
     ax.set_xticks(np.arange(1, len(plotLabels) + 1))
     ax.set_xticklabels(plotLabels)
-    ax.set_ylim(0.9, 1.1)
+    ax.set_ylim(-0.1, 1.1)
     ax.grid(axis="y", linestyle="--", alpha=0.7)
     ax.set_ylabel("Performance Score")
 

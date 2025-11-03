@@ -9,15 +9,11 @@
         "sampled_distribution": [
             [
                 "100010001",
-                9999
-            ],
-            [
-                "100000011",
-                1
+                10000
             ]
         ],
         "num_training_loops": 20,
-        "final_training_cost": -94.9951171875,
+        "final_training_cost": -95.0,
         "optimal_params": [
             3.142592653589793,
             0.0
