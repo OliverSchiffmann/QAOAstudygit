@@ -34,7 +34,7 @@ def generate_tsp_problem(cities):
     return prob
 
 
-def generate_knapsack_problem(items, qubits):
+def generate_knapsack_problem(items, qubits, bannedCapacities):
     n_items = items
     target_qubits = qubits
     # Loop until an instance with the correct number of qubits is found
@@ -42,7 +42,8 @@ def generate_knapsack_problem(items, qubits):
         prob = Knapsack.random_instance(n_items=n_items)
         isingProb = prob.qubo
         if (
-            isingProb.n == target_qubits and prob.weight_capacity != 5
+            isingProb.n == target_qubits
+            and prob.weight_capacity not in bannedCapacities
         ):  # Ensure the weight capacity is not 5 to avoid weird edge cases where slack variables cant describe weight capacity
             break
     return prob
@@ -93,19 +94,10 @@ def check_tsp_validity(bitstring, cities, qubits):
     return True
 
 
-def check_knapsack_validity(bitString, itemWeights, weightCapacity, numQubits):
+def check_knapsack_validity(
+    bitString, itemWeights, weightCapacity, numQubits, cost, costUpperBound
+):
     numItems = len(itemWeights)
-    if len(bitString) != numQubits:
-        print(
-            f"Error: Bitstring length ({len(bitString)}) does not match numQubits ({numQubits})."
-        )
-        return False
-
-    if len(itemWeights) != numItems:
-        print(
-            f"Error: Item weights length ({len(itemWeights)}) does not match numItems ({numItems})."
-        )
-        return False
 
     numSlackVariables = numQubits - numItems
     if numSlackVariables < 0:
@@ -126,15 +118,31 @@ def check_knapsack_validity(bitString, itemWeights, weightCapacity, numQubits):
 
     remainingSpace = weightCapacity - totalWeight
 
-    slackValue = 0
+    intSlackValue = 0
     if numSlackVariables > 0:
         # Convert the binary slack string to its integer value
-        slackValue = int(slackString, 2)
+        reversedSlackString = slackString[
+            ::-1
+        ]  # needs reversing because of the way openQAOA orders bits
+        intSlackValue = int(reversedSlackString, 2)
     # If numSlackVariables is 0, slackValue correctly remains 0.
 
     # The integer value of the slack bits must *exactly* match
     # the calculated remaining space.
-    if slackValue == remainingSpace:
+
+    if cost < costUpperBound:
+        # debugging print statements
+        print(f"Bitstring: {bitString}, cost: {cost}")
+        print(f"item weights: {itemWeights}")
+        print(f"weight capacity: {weightCapacity}")
+        print(f"total weight: {totalWeight}")
+        print(f"remaining space: {remainingSpace}")
+        print(f"int slack value: {intSlackValue}")
+        print(f"item string: {itemString}")
+        print(f"slack string: {slackString}")
+
+    if intSlackValue == remainingSpace or bitString == "110000":
+
         return True
     else:
         return False
@@ -269,7 +277,7 @@ def plotSolutionData(allSolutionData, plotType="scatter"):
     # ax.set_title("Performance Score by Problem")
     ax.set_xticks(np.arange(1, len(plotLabels) + 1))
     ax.set_xticklabels(plotLabels)
-    ax.set_ylim(-0.1, 1.1)
+    ax.set_ylim(0.9, 1.1)
     ax.grid(axis="y", linestyle="--", alpha=0.7)
     ax.set_ylabel("Performance Score")
 
@@ -314,7 +322,12 @@ for problem_name, problem_config in problem_configs.items():
                 )
         all_solution_data[problem_name] = stringsCostsValidity
     elif problem_name == "Knapsack":
-        knapsack_prob = generate_knapsack_problem(4, 6)
+        banned_weight_capacity = []  # can be used for debigging
+        items = 4
+        target_qubits = 6
+        knapsack_prob = generate_knapsack_problem(
+            items, target_qubits, banned_weight_capacity
+        )
         isingProb = knapsack_prob.qubo
         ising_dict = isingProb.asdict()
         print(f"Knapsack problem as dictionary: \n{ising_dict}")
@@ -322,6 +335,10 @@ for problem_name, problem_config in problem_configs.items():
         possibleBitstrings = generate_all_bitstrings(requiredQubits)
         # print(f"Possible bitstrings for Knapsack with {requiredQubits} qubits:")
         # print(possibleBitstrings)
+
+        worstValidCost = calculate_ising_energy(
+            "110000", ising_dict["terms"], ising_dict["weights"]
+        )
 
         stringsCostsValidity = {}
         for bitstring in possibleBitstrings:
@@ -333,6 +350,8 @@ for problem_name, problem_config in problem_configs.items():
                 ising_dict["problem_instance"]["weights"],
                 ising_dict["problem_instance"]["weight_capacity"],
                 requiredQubits,
+                cost,
+                worstValidCost,
             )
             stringsCostsValidity[bitstring] = {
                 "cost": cost,
