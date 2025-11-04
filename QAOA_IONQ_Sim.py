@@ -148,8 +148,8 @@ def runSingleSimulation(args):
 
     # --- Variables ---
     INDIVIDUAL_RESULTS_FOLDER = "individual_results_warehouse"
-    reps_p = 4  # Number of QAOA layers
-    simType = "NOISY"  # options: 'IDEAL','NOISY'
+    reps_p = 20  # Number of QAOA layers
+    simType = "IDEAL"  # options: 'IDEAL','NOISY'
 
     # --- Backend Setup ---
     ionqApiToken = os.environ.get("IONQ_API_TOKEN")

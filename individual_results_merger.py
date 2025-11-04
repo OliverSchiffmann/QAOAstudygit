@@ -11,7 +11,8 @@ FINAL_OUTPUT_DIR = "merged_results_warehouse_test"
 def merge_all_problem_classes():
     # 'None' is used as a placeholder for filenames that do not specify a depth.
     qaoaDepths = [None, 1, 2, 3, 4, 20]
-    missingFilesLog = []
+    completeResultSets = []
+    individualResultsTracker = {}
     for problemName, problemConfig in problem_configs.items():
         for providerName, providerConfig in provider_configs.items():
             for depth in qaoaDepths:
@@ -39,10 +40,12 @@ def merge_all_problem_classes():
                 individualFiles = glob.glob(searchPattern)
 
                 print(f"Found {len(individualFiles)} result files to merge.")
-                if len(individualFiles) < 100 or individualFiles is None:
-                    missingFilesLog.append(
-                        f"{problemName}, {providerName}, {depthDescription}: Only found {len(individualFiles)} files."
-                    )
+                if len(individualFiles) == 100:
+                    completeResultSets.append((problemName, providerName, depth))
+
+                individualResultsTracker[(problemName, providerName, depth)] = len(
+                    individualFiles
+                )  # for tacking how many files for each set i have collected
 
                 if not individualFiles:
                     continue
@@ -77,10 +80,23 @@ def merge_all_problem_classes():
                 print(
                     f"Successfully merged {len(allResults)} results into {finalPath}\n"
                 )
-
-    print("Missing Files Log:")
-    for logEntry in missingFilesLog:
-        print(logEntry)
+    for problemName, problemConfig in problem_configs.items():
+        for providerName, providerConfig in provider_configs.items():
+            for depth in qaoaDepths:
+                if (problemName, providerName, depth) not in completeResultSets:
+                    if (depth is None or depth == 20) and (
+                        providerName == "IBM_NOISY"
+                        or providerName == "IONQ_NOISY"
+                        or providerName == "ALICEBOB"
+                    ):
+                        continue  # skip depth 20 for noisy sims
+                    else:
+                        numFiles = individualResultsTracker.get(
+                            (problemName, providerName, depth), 0
+                        )
+                        print(
+                            f"WARNING: Incomplete result set for {problemName} from {providerName} at depth {depth}, found: {numFiles} files"
+                        )
 
 
 if __name__ == "__main__":

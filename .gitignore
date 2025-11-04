@@ -6,6 +6,7 @@ qiskitProviderVenv
 plotLandscapeVenv
 aliceBobVenv
 braketVenv
+annealVenv
 *.silf
 .env
 __pycache__/

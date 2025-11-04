@@ -14,4 +14,5 @@ provider_configs = {
     "IONQ_NOISY": {"file_slug": "aria-1_"},
     "IBM_NOISY": {"file_slug": "aer_simulator_from(fake_torino)_"},
     "ALICEBOB": {"file_slug": "EMU:15Q:LOGICAL_EARLY_"},
+    "DWAVE": {"file_slug": "dwave_"},
 }
