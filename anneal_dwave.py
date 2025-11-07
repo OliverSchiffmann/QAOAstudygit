@@ -1,9 +1,12 @@
-# python anneal_dwave.py --problem_type MaxCut --instance_id 1 --simulator bruh
+# python anneal_dwave.py --problem_type MaxCut --instance_id 1 --simulator quantumAnnealing
+# script to simulate qunatum annealing on single instance
+# waiting for dwave access to test on real QPU
 import dimod
 import argparse
 import json
 from config import problem_configs
 from dwave.samplers import PathIntegralAnnealingSampler
+from dwave.system import DWaveSampler, EmbeddingComposite
 
 
 def setup_configuration():
@@ -127,8 +130,8 @@ if __name__ == "__main__":
 
     if backend_identifier == "simulatedAnnealing":
         sampler = PathIntegralAnnealingSampler()
-    elif backend_identifier == "bruh":
-        print("placeholder for real QPU")
+    elif backend_identifier == "quantumAnnealing":
+        sampler = EmbeddingComposite(DWaveSampler())
     else:
         raise ValueError(f"Unknown backend identifier: {backend_identifier}")
 

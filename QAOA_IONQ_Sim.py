@@ -148,8 +148,8 @@ def runSingleSimulation(args):
 
     # --- Variables ---
     INDIVIDUAL_RESULTS_FOLDER = "individual_results_warehouse"
-    reps_p = 20  # Number of QAOA layers
-    simType = "IDEAL"  # options: 'IDEAL','NOISY'
+    reps_p = 3  # Number of QAOA layers
+    simType = "NOISY"  # options: 'IDEAL','NOISY'
 
     # --- Backend Setup ---
     ionqApiToken = os.environ.get("IONQ_API_TOKEN")
@@ -242,11 +242,12 @@ def runSingleSimulation(args):
 
 if __name__ == "__main__":
     problemTypeToRun = (
-        "MaxCut"  # options: 'TSP','Knapsack', 'MinimumVertexCover', 'MaxCut'
+        "Knapsack"  # options: 'TSP','Knapsack', 'MinimumVertexCover', 'MaxCut'
     )
-    instancesToRun = range(1, 101)
+    # instancesToRun = range(1, 101)
+    instancesToRun = [49]  # specific instance for testing
     tasks = [(problemTypeToRun, i) for i in instancesToRun]
-    maxWorkers = 100
+    maxWorkers = 1
     print(f"Starting {len(tasks)} simulations using up to {maxWorkers} threads...")
 
     with ProcessPoolExecutor(max_workers=maxWorkers) as executor:

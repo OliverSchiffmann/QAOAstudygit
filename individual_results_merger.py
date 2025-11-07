@@ -43,15 +43,13 @@ def merge_all_problem_classes():
                 if len(individualFiles) == 100:
                     completeResultSets.append((problemName, providerName, depth))
 
-                individualResultsTracker[(problemName, providerName, depth)] = len(
-                    individualFiles
-                )  # for tacking how many files for each set i have collected
-
                 if not individualFiles:
                     continue
 
                 allResults = []
                 metadata = {}
+
+                collectedInstanceIDs = []
 
                 for filePath in individualFiles:
                     with open(filePath, "r") as f:
@@ -61,6 +59,20 @@ def merge_all_problem_classes():
 
                     if not metadata:
                         metadata = data["metadata"]
+
+                    collectedInstanceIDs.append(
+                        data["result"]["instance_id"]
+                    )  # keep ttrack of the instance ids i have collected
+
+                missingInstanceIDs = []
+                for i in range(1, 101):  # find missing instance ids
+                    if i not in collectedInstanceIDs:
+                        missingInstanceIDs.append(i)
+
+                individualResultsTracker[(problemName, providerName, depth)] = (
+                    len(individualFiles),
+                    missingInstanceIDs,
+                )
 
                 allResults.sort(key=lambda x: x["instance_id"])
 
@@ -80,6 +92,7 @@ def merge_all_problem_classes():
                 print(
                     f"Successfully merged {len(allResults)} results into {finalPath}\n"
                 )
+
     for problemName, problemConfig in problem_configs.items():
         for providerName, providerConfig in provider_configs.items():
             for depth in qaoaDepths:
@@ -92,11 +105,16 @@ def merge_all_problem_classes():
                         continue  # skip depth 20 for noisy sims
                     else:
                         numFiles = individualResultsTracker.get(
-                            (problemName, providerName, depth), 0
-                        )
+                            (problemName, providerName, depth), (0, [])
+                        )[0]
+                        missing_ids = individualResultsTracker.get(
+                            (problemName, providerName, depth), (0, [])
+                        )[1]
                         print(
-                            f"WARNING: Incomplete result set for {problemName} from {providerName} at depth {depth}, found: {numFiles} files"
+                            f"WARNING: {problemName} incomplete for {providerName} at depth {depth}, found: {numFiles} files"
                         )
+                        if missing_ids:
+                            print(f"Missing instance IDs: {missing_ids}")
 
 
 if __name__ == "__main__":
