@@ -177,7 +177,7 @@ def create_inital_state(num_qubits, problem_type, weight_capacity=None):
     elif problem_type == "Knapsack":
         initial_circuit.x(
             [0, 1]
-        )  # empty knapsack with no items i guaranteed valid solution
+        )  # empty knapsack with no items is not guaranteed a valid solution but.... eh
 
     elif problem_type == "MinimumVertexCover":
         # initial_circuit.h(range(num_qubits))

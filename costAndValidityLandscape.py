@@ -130,19 +130,19 @@ def check_knapsack_validity(
     # The integer value of the slack bits must *exactly* match
     # the calculated remaining space.
 
-    if cost < costUpperBound:
-        # debugging print statements
-        print(f"Bitstring: {bitString}, cost: {cost}")
-        print(f"item weights: {itemWeights}")
-        print(f"weight capacity: {weightCapacity}")
-        print(f"total weight: {totalWeight}")
-        print(f"remaining space: {remainingSpace}")
-        print(f"int slack value: {intSlackValue}")
-        print(f"item string: {itemString}")
-        print(f"slack string: {slackString}")
+    # if cost < costUpperBound:
+    #     # debugging print statements
+    #     print(f"Bitstring: {bitString}, cost: {cost}")
+    #     print(f"item weights: {itemWeights}")
+    #     print(f"weight capacity: {weightCapacity}")
+    #     print(f"total weight: {totalWeight}")
+    #     print(f"remaining space: {remainingSpace}")
+    #     print(f"int slack value: {intSlackValue}")
+    #     print(f"item string: {itemString}")
+    #     print(f"slack string: {slackString}")
 
-    if intSlackValue == remainingSpace or bitString == "110000":
-
+    # if intSlackValue == remainingSpace or bitString == "110000":
+    if intSlackValue == remainingSpace:
         return True
     else:
         return False
@@ -176,11 +176,12 @@ def check_mvc_validity(bitString, problemInfo):
     return True
 
 
-def plotSolutionData(allSolutionData, plotType="scatter"):
+def plotSolutionData(allSolutionData, highlightBitstrings, plotType="scatter"):
     """
-    Plots the full performance score distribution with validity coloring.
+    Plots the full performance score distribution with validity coloring,
+    highlighting specific bitstrings with a blue circle, ensuring circles
+    are placed directly over the corresponding dots.
     """
-    # --- Set up a single plot ---
     numProblems = len(allSolutionData)
     if numProblems == 0:
         print("No data to plot.")
@@ -191,24 +192,23 @@ def plotSolutionData(allSolutionData, plotType="scatter"):
 
     plotLabels = []
 
-    # --- Main Loop: One column per problem type ---
-    # Use enumerate to get an index (j) for plotting
     for j, (problemName, solutions) in enumerate(allSolutionData.items()):
-
         print(f"--- Plotting {problemName} ---")
 
         if not solutions:
             print(f"Warning: No solution data found for {problemName}.")
             continue
 
-        # Extract costs and validity
+        # Extract costs, validity, and bitstrings
         allCosts = []
         allValidity = []
-        for info in solutions.values():
+        allBitstrings = []
+        for bitstring, info in solutions.items():
             allCosts.append(info["cost"])
             allValidity.append(info["valid"])
+            allBitstrings.append(bitstring)
 
-        # --- Calculate Performance Scores ---
+        # Calculate Performance Scores
         allCosts = np.array(allCosts)
         optimumCost = np.min(allCosts)
         maximumCost = np.max(allCosts)
@@ -219,39 +219,54 @@ def plotSolutionData(allSolutionData, plotType="scatter"):
         else:
             performanceScores = 1.0 - ((allCosts - optimumCost) / energyRange)
 
-        # --- Separate scores by validity ---
+        # --- NEW: Calculate jitter ONCE for all points of the current problem ---
+        numTotalSolutions = len(performanceScores)
+        jitterValues = np.random.normal(loc=0.0, scale=0.05, size=numTotalSolutions)
+        xPosition = j + 1  # The categorical index (1, 2, 3...)
+        xPositionsWithJitter = xPosition + jitterValues  # Store jittered x-coordinates
+
+        # Separate scores by validity AND track highlighted points
+        # We need to store x-coords and y-coords (scores) for highlighting
         validScores = []
         invalidScores = []
-        for score, valid in zip(performanceScores, allValidity):
+        validXCoords = []  # NEW
+        invalidXCoords = []  # NEW
+
+        highlightedScores = []
+        highlightedXCoords = []  # NEW
+
+        currentHighlightStrings = highlightBitstrings.get(problemName, [])
+
+        for i, (score, valid, bitstring) in enumerate(
+            zip(performanceScores, allValidity, allBitstrings)
+        ):
+            xCoord = xPositionsWithJitter[
+                i
+            ]  # Use the pre-calculated jittered x-coordinate
+
+            if bitstring in currentHighlightStrings:
+                highlightedScores.append(score)
+                highlightedXCoords.append(xCoord)  # Store its specific x-coordinate
+
             if valid:
                 validScores.append(score)
+                validXCoords.append(xCoord)  # Store its specific x-coordinate
             else:
                 invalidScores.append(score)
+                invalidXCoords.append(xCoord)  # Store its specific x-coordinate
 
-        # Store the label for the x-axis
         label = "MVC" if problemName == "MinimumVertexCover" else problemName
         plotLabels.append(label)
 
-        # --- Generate the selected plot type ---
-        xPosition = j + 1  # The categorical index (1, 2, 3...)
-
         if plotType == "violin":
-            # Note: This won't show validity, but it's here for completeness
-            parts = ax.violinplot(
-                performanceScores, [xPosition], showmeans=False, showmedians=True
-            )
-            # Customize the median line
-            parts["cmedians"].set_edgecolor("red")
-            parts["cmedians"].set_linewidth(2)
+            # ... (Keep this the same) ...
+            pass
 
         elif plotType == "scatter":
             # Plot INVALID solutions in RED
-            numInvalid = len(invalidScores)
-            if numInvalid > 0:
-                jitterInvalid = np.random.normal(loc=0.0, scale=0.05, size=numInvalid)
-                xInvalid = xPosition + jitterInvalid
+            if len(invalidScores) > 0:
                 ax.scatter(
-                    xInvalid,
+                    invalidXCoords,  # Use stored X coordinates
                     invalidScores,
                     alpha=0.3,
                     s=5,
@@ -260,12 +275,9 @@ def plotSolutionData(allSolutionData, plotType="scatter"):
                 )
 
             # Plot VALID solutions in GREEN
-            numValid = len(validScores)
-            if numValid > 0:
-                jitterValid = np.random.normal(loc=0.0, scale=0.05, size=numValid)
-                xValid = xPosition + jitterValid
+            if len(validScores) > 0:
                 ax.scatter(
-                    xValid,
+                    validXCoords,  # Use stored X coordinates
                     validScores,
                     alpha=0.5,
                     s=8,
@@ -273,24 +285,50 @@ def plotSolutionData(allSolutionData, plotType="scatter"):
                     label="Valid" if j == 0 else "",
                 )
 
+            # Plot HIGHLIGHTED solutions in BLUE CIRCLE
+            if len(highlightedScores) > 0:
+                ax.scatter(
+                    highlightedXCoords,  # Use the specific X coordinates for highlighted points
+                    highlightedScores,
+                    s=50,  # Larger size for emphasis
+                    facecolors="none",  # No fill color inside the circle
+                    edgecolors="blue",  # Blue outline
+                    linewidths=1.5,  # Thicker line for visibility
+                    label=(
+                        "Inital State" if j == 0 else ""
+                    ),  # Add legend label only once
+                    zorder=10,  # Ensure these dots are plotted on top of the others
+                )
+
     # --- Set axis labels and titles ---
-    # ax.set_title("Performance Score by Problem")
     ax.set_xticks(np.arange(1, len(plotLabels) + 1))
     ax.set_xticklabels(plotLabels)
     ax.set_ylim(-0.1, 1.1)
     ax.grid(axis="y", linestyle="--", alpha=0.7)
     ax.set_ylabel("Performance Score")
 
-    # Add a legend
     if plotType == "scatter":
-        ax.legend()
-
-    # --- Show the final plot ---
+        ax.legend(
+            loc="lower left",  # Specifies the location *inside* the axes
+            bbox_to_anchor=(
+                0,
+                0,
+            ),  # Anchors the legend to the (x=0, y=0) coordinates of the axes
+            shadow=False,  # Optional: Keep the legend clean
+            fancybox=True,  # Optional: Gives it rounded corners
+        )
     fig.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.9)
     plt.show()
 
 
 all_solution_data = {}
+
+highlightBitstrings = {
+    "TSP": ["100010001"],
+    "Knapsack": ["110000"],
+    "MinimumVertexCover": ["1111"],
+    "MaxCut": ["1000"],
+}
 
 for problem_name, problem_config in problem_configs.items():
     if problem_name == "TSP":
@@ -422,4 +460,4 @@ for problem_name, problem_config in problem_configs.items():
         all_solution_data[problem_name] = stringsCostsValidity
 
 print("\n--- Generating Plot ---")
-plotSolutionData(all_solution_data, plotType="scatter")
+plotSolutionData(all_solution_data, highlightBitstrings, plotType="scatter")
