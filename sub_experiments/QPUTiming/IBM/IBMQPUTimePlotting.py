@@ -74,7 +74,23 @@ if __name__ == "__main__":
             simQPUTimes[depth][problem] = [
                 loops * avgQPUTimePerLoop for loops in numLoops[depth][problem]
             ]
-    print(simQPUTimes)
+    # print(simQPUTimes)
+
+    # Summing all QPU times to get total estimated QPU time
+    totalEstimatedQPUTimes = {}
+    for depth in simQPUTimes:
+        totalEstimatedQPUTimes[depth] = {}
+        for problem in simQPUTimes[depth]:
+            totalEstimatedQPUTimes[depth][problem] = sum(simQPUTimes[depth][problem])
+    # print(
+    #     "Total Estimated QPU Times (s) per depth and problem:", totalEstimatedQPUTimes
+    # )
+    totalQPUTime = 0
+    for depth in totalEstimatedQPUTimes:
+        for problem in totalEstimatedQPUTimes[depth]:
+            totalQPUTime += totalEstimatedQPUTimes[depth][problem]
+    print(f"Overall Total Estimated QPU Time (s): {totalQPUTime}")
+    print(f"Overall Total Estimated QPU Time (mins): {totalQPUTime / 60}")
 
     # Plotting
     fig, axes = plt.subplots(
@@ -101,7 +117,7 @@ if __name__ == "__main__":
         plotData = [simQPUTimes[i][problem] for problem in originalLabels]
         if any(len(d) > 0 for d in plotData):
             ax.boxplot(plotData, tick_labels=plotLabels, patch_artist=True)
-            ax.set_ylim(0, 1200)
+            ax.set_ylim(0, 1000)
             ax.grid(axis="y", linestyle="--", alpha=0.7)
         else:
             ax.text(0.5, 0.5, "No data found", ha="center", va="center")
