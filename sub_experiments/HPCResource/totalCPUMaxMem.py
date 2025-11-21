@@ -2,6 +2,21 @@ import pandas as pd
 import re
 import numpy as np
 
+# ==============================================================================
+# SLURM Resource Consumption Analysis Script
+# ==============================================================================
+# This script processes raw job accounting data typically retrieved from a SLURM
+# workload manager (e.g., using 'sacct').
+#
+# Its primary purpose is to calculate and summarize the classical HPC resources
+# consumed by the QAOA simulation study, focusing on:
+# 1. Total cumulative CPU time (sum of all 'batch' steps).
+# 2. Maximum peak memory (RAM) used by any single 'batch' step.
+#
+# The script includes custom functions to correctly parse the specific time and
+# memory string formats output by SLURM into standardized units (seconds and GB).
+# ==============================================================================
+
 # Define the input filename based on the previous step
 inputFile = "qaoaStudyResults.csv"
 # Define the memory unit conversion factor (KB to GB)
@@ -10,7 +25,17 @@ KILOBYTES_TO_GIGABYTES = 1024 * 1024
 
 def convertSlurmTimeToSeconds(timeStr: str) -> int:
     """
-    Converts a SLURM time string (e.g., 'D-HH:MM:SS' or 'HH:MM:SS') to total seconds.
+    Converts a SLURM time string (e.g., 'D-HH:MM:SS', 'HH:MM:SS', or 'MM:SS')
+    to the total number of seconds.
+
+    Handles different SLURM time formats, including optional days.
+
+    Args:
+        timeStr (str): The raw time string from the SLURM output.
+
+    Returns:
+        int: The total time duration in seconds. Returns 0 if input is
+             missing or in an unexpected format.
     """
     if pd.isna(timeStr) or timeStr == "None":
         return 0
@@ -29,9 +54,10 @@ def convertSlurmTimeToSeconds(timeStr: str) -> int:
     hours, minutes, seconds = 0, 0, 0
 
     if len(parts) == 3:
+        # Format is HH:MM:SS
         hours, minutes, seconds = map(int, parts)
     elif len(parts) == 2:
-        # Assumes format is MM:SS or HH:MM if only two parts are present (common for short times)
+        # Assumes format is MM:SS (common for short times)
         minutes, seconds = map(int, parts)
         hours = 0
     else:
@@ -44,7 +70,18 @@ def convertSlurmTimeToSeconds(timeStr: str) -> int:
 
 def getMaxMemoryInGB(memoryStr: str) -> float:
     """
-    Converts a SLURM memory string (e.g., '4743112K', '4743112', or '0') to Gigabytes.
+    Converts a SLURM memory string (e.g., '4743112K', '4743112M', or '0')
+    to Gigabytes.
+
+    The function handles Kilobytes ('K'), Megabytes ('M'), or unitless values
+    (assumed to be Kilobytes).
+
+    Args:
+        memoryStr (str): The raw memory string from the SLURM MaxRSS column.
+
+    Returns:
+        float: The memory usage converted to Gigabytes (GB). Returns 0.0 if
+               input is missing or non-numeric.
     """
     if pd.isna(memoryStr) or memoryStr == "None":
         return 0.0
@@ -52,12 +89,15 @@ def getMaxMemoryInGB(memoryStr: str) -> float:
     # Clean the string, removing trailing 'K' or 'M' if present (case-insensitive)
     cleanedStr = str(memoryStr).strip().upper()
 
+    unit_multiplier = 1
     if "K" in cleanedStr:
+        # Input is in Kilobytes
         cleanedStr = cleanedStr.replace("K", "")
         unit_multiplier = 1
     elif "M" in cleanedStr:
+        # Input is in Megabytes, convert to Kilobytes
         cleanedStr = cleanedStr.replace("M", "")
-        unit_multiplier = 1024  # Convert MB to KB
+        unit_multiplier = 1024
     else:
         # Assume it's already in Kilobytes (K) or is 0 if no unit is specified
         unit_multiplier = 1
@@ -74,6 +114,13 @@ def getMaxMemoryInGB(memoryStr: str) -> float:
 def analyzeSlurmData(fileName: str):
     """
     Main function to load, process, and analyze the SLURM job data.
+
+    Reads the job data, cleans the column names, applies time and memory
+    conversion functions, filters for the core simulation steps, and prints
+    the resource consumption summary.
+
+    Args:
+        fileName (str): The path to the SLURM output CSV file.
     """
     try:
         # Read the file using whitespace ('\s+') as the separator

@@ -1,3 +1,25 @@
+# ==============================================================================
+# QAOA Optimization and Simulation Script (IonQ Provider)
+# ==============================================================================
+# This script executes the Quantum Approximate Optimization Algorithm (QAOA)
+# using the IonQ provider. It is specifically designed to handle the unique
+# challenges of remote API interaction and to leverage parallel processing.
+#
+# Key Features:
+# 1. Custom Callback Class: A `QAOACallback` class manages the optimization
+#    steps, providing robust error handling (retries on ConnectionError) and
+#    thread-safe tracking of optimization progress.
+# 2. Parallel Execution: Uses `ProcessPoolExecutor` to run multiple simulation
+#    instances concurrently, maximizing throughput.
+# 3. IonQ Configuration: Sets up the 'ionq_simulator' backend, optionally
+#    applying the 'aria-1' noise model for realistic simulation.
+#
+# Workflow:
+# - Configures problem and instance parameters.
+# - Sets up the IonQ backend and transpiler (PassManager).
+# - Runs the optimization loop using COBYLA and the custom callback.
+# - Samples the final circuit and saves results to JSON.
+# ==============================================================================
 import argparse
 import os
 import time
@@ -30,9 +52,23 @@ load_dotenv()  # Load environment variables from .env file
 
 # ////////// Classes ////////////
 class QAOACallback:
-    """A thread-safe class to hold the state of the optimization callback."""
+    """
+    A thread-safe class to manage the optimization lifecycle and handle
+    communication resilience with the IonQ API.
+
+    This class encapsulates the cost function evaluation, allowing for state
+    tracking (iteration counts, cost history) and robust error handling.
+    """
 
     def __init__(self, ansatz, estimator, costHamiltonian):
+        """
+        Initialize the callback handler.
+
+        Args:
+            ansatz (QuantumCircuit): The parameterized QAOA circuit.
+            estimator (EstimatorV2): The Qiskit Estimator primitive for cost evaluation.
+            costHamiltonian (SparsePauliOp): The cost Hamiltonian operator.
+        """
         self.ansatz = ansatz
         self.estimator = estimator
         self.costHamiltonian = costHamiltonian
@@ -40,7 +76,20 @@ class QAOACallback:
         self.objectiveFuncVals = []
 
     def cost_func_estimator(self, params, instance_id):
-        """A robust cost function that handles network errors."""
+        """
+        The core cost function evaluated by the optimizer.
+
+        It attempts to run the estimator job up to `max_retries` times to
+        handle transient network errors (ConnectionError).
+
+        Args:
+            params (list): Current QAOA parameters (gammas/betas).
+            instance_id (int): ID of the problem instance (for logging).
+
+        Returns:
+            float: The expected cost value (energy). Returns infinity if
+                   all network retries fail.
+        """
         max_retries = 3
         for attempt in range(max_retries):
             try:
@@ -73,9 +122,21 @@ class QAOACallback:
         )
         return float("inf")
 
-    def cost_function_wrapper(
-        self, params, instance_id
-    ):  # required because ionq cant handle 0.0 angle roation gates, gateset=native should avoid this problem but just in case
+    def cost_function_wrapper(self, params, instance_id):
+        """
+        Wraps the cost function to sanitize input parameters.
+
+        IonQ backends can sometimes have issues with gate rotation angles of exactly 0.0.
+        This wrapper replaces exact zeros with a tiny epsilon value.
+
+        Args:
+            params (list): QAOA parameters.
+            instance_id (int): The instance identifier.
+
+        Returns:
+            float: The evaluated cost.
+        """
+        # required because ionq cant handle 0.0 angle roation gates, gateset=native should avoid this problem but just in case
         epsilon = 1e-9
         safe_params = np.copy(params)
         # Find where parameters are exactly 0 and replace them with epsilon
@@ -93,7 +154,8 @@ def setup_configuration():
         tuple: A tuple containing:
             - problem_type (str)
             - instanceOfInterest (int)
-            - isingFileName (str)
+            - isingFileName (str): Path to the batch file.
+            - problem_file_name_tag (str): Identifier for the problem class.
     """
     FILEDIRECTORY = "isingBatches"
 
@@ -134,8 +196,13 @@ def setup_configuration():
 
 def runSingleSimulation(args):
     """
-    Runs the complete QAOA optimization for a single problem instance.
-    This function is designed to be called by a thread.
+    Executes a complete QAOA optimization run for a single problem instance.
+
+    This function is designed to be a self-contained unit of work compatible
+    with `ProcessPoolExecutor` for parallel processing.
+
+    Args:
+        args (tuple): A tuple containing (problemType, instanceOfInterest).
     """
     # Unpack the arguments for this specific run
     problemType, instanceOfInterest = args
@@ -207,6 +274,7 @@ def runSingleSimulation(args):
 
     print(f"(Instance: {instanceOfInterest}) Submitted sampling job with ID: {job_id}")
 
+    # Active polling for job completion
     while job.status() in [JobStatus.QUEUED, JobStatus.INITIALIZING, JobStatus.RUNNING]:
         time.sleep(2)
     print(f"(Instance: {instanceOfInterest}) Final job status: {job.status().name}")
@@ -241,15 +309,17 @@ def runSingleSimulation(args):
 
 
 if __name__ == "__main__":
+    # Define the problem type and instances to be processed
     problemTypeToRun = (
         "Knapsack"  # options: 'TSP','Knapsack', 'MinimumVertexCover', 'MaxCut'
     )
-    # instancesToRun = range(1, 101)
-    instancesToRun = [49]  # specific instance for testing
+    instancesToRun = range(1, 101)
+    # instancesToRun = [49]  # specific instance for testing
     tasks = [(problemTypeToRun, i) for i in instancesToRun]
     maxWorkers = 1
     print(f"Starting {len(tasks)} simulations using up to {maxWorkers} threads...")
 
+    # Use ProcessPoolExecutor to manage concurrent execution of simulations
     with ProcessPoolExecutor(max_workers=maxWorkers) as executor:
         # submit() returns a Future object for each task
         futureToTask = {

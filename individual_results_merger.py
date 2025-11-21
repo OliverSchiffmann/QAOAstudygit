@@ -1,3 +1,18 @@
+# ==============================================================================
+# QAOA Full Results Batch Merger
+# ==============================================================================
+# This script consolidates the results from all individual QAOA simulation runs
+# (across all problems, providers, and depths) into master MERGED_results JSON
+# files.
+#
+# It performs critical data integrity checks by:
+# 1. Counting the number of individual result files found for each configuration.
+# 2. Identifying and printing the Instance IDs (1 to 100) that are missing.
+# 3. Skipping the processing of p=20 for noisy simulators, as expected by the study design.
+#
+# Input: Individual JSON files located in the SOURCE_DIR.
+# Output: Consolidated MERGED_results JSON files in the FINAL_OUTPUT_DIR.
+# ==============================================================================
 import json
 import os
 import glob
@@ -5,14 +20,25 @@ from config import problem_configs, provider_configs
 
 # Configuration
 SOURCE_DIR = "individual_results_warehouse"
-FINAL_OUTPUT_DIR = "merged_results_warehouse_test"
+FINAL_OUTPUT_DIR = "merged_results_warehouse"
 
 
 def merge_all_problem_classes():
+    """
+    Iterates through every combination of problem type, provider, and QAOA depth
+    to merge individual result files into a single, comprehensive batch file
+    per configuration.
+
+    It tracks completeness and prints warnings for any configuration that
+    is missing expected instances (i.e., fewer than 100 files found).
+    """
     # 'None' is used as a placeholder for filenames that do not specify a depth.
     qaoaDepths = [None, 1, 2, 3, 4, 20]
     completeResultSets = []
+    # Tracker stores ((ProblemName, ProviderName, Depth), (FileCount, MissingIDs))
     individualResultsTracker = {}
+
+    # --- Part 1: Merge files and check for missing instances ---
     for problemName, problemConfig in problem_configs.items():
         for providerName, providerConfig in provider_configs.items():
             for depth in qaoaDepths:
@@ -33,17 +59,25 @@ def merge_all_problem_classes():
                 providerFileSlug = providerConfig["file_slug"]
 
                 # Build the search pattern dynamically based on the current depth
+                # Looks for files named like: ...num_XX.json (where XX is the instance ID)
                 searchPattern = os.path.join(
                     SOURCE_DIR,
                     f"{problemFileSlug}{providerFileSlug}{depthSlug}num_*.json",
                 )
                 individualFiles = glob.glob(searchPattern)
 
-                print(f"Found {len(individualFiles)} result files to merge.")
-                if len(individualFiles) == 100:
+                numFilesFound = len(individualFiles)
+                print(f"Found {numFilesFound} result files to merge.")
+
+                if numFilesFound == 100:
                     completeResultSets.append((problemName, providerName, depth))
 
                 if not individualFiles:
+                    # If no files found, still record the state for the tracker
+                    individualResultsTracker[(problemName, providerName, depth)] = (
+                        0,
+                        list(range(1, 101)),
+                    )
                     continue
 
                 allResults = []
@@ -51,6 +85,7 @@ def merge_all_problem_classes():
 
                 collectedInstanceIDs = []
 
+                # Read files, aggregate data, and collect instance IDs
                 for filePath in individualFiles:
                     with open(filePath, "r") as f:
                         data = json.load(f)
@@ -65,15 +100,18 @@ def merge_all_problem_classes():
                     )  # keep ttrack of the instance ids i have collected
 
                 missingInstanceIDs = []
+                # Find which instance IDs from 1 to 100 are missing
                 for i in range(1, 101):  # find missing instance ids
                     if i not in collectedInstanceIDs:
                         missingInstanceIDs.append(i)
 
+                # Record the findings in the tracker
                 individualResultsTracker[(problemName, providerName, depth)] = (
-                    len(individualFiles),
+                    numFilesFound,
                     missingInstanceIDs,
                 )
 
+                # Sort the final results by instance ID before merging
                 allResults.sort(key=lambda x: x["instance_id"])
 
                 finalData = {"metadata": metadata, "results": allResults}
@@ -93,10 +131,12 @@ def merge_all_problem_classes():
                     f"Successfully merged {len(allResults)} results into {finalPath}\n"
                 )
 
+    # --- Part 2: Print warnings for incomplete sets ---
     for problemName, problemConfig in problem_configs.items():
         for providerName, providerConfig in provider_configs.items():
             for depth in qaoaDepths:
                 if (problemName, providerName, depth) not in completeResultSets:
+                    # Skip depth 20 for noisy backends as per your study design
                     if (depth is None or depth == 20) and (
                         providerName == "IBM_NOISY"
                         or providerName == "IONQ_NOISY"
@@ -104,6 +144,7 @@ def merge_all_problem_classes():
                     ):
                         continue  # skip depth 20 for noisy sims
                     else:
+                        # Print warning for any set not found or incomplete
                         numFiles = individualResultsTracker.get(
                             (problemName, providerName, depth), (0, [])
                         )[0]

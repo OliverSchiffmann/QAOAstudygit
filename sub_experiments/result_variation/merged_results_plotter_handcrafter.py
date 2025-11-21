@@ -1,7 +1,17 @@
-# example usage
+# ==============================================================================
+# QAOA Performance Score Plotter
+# ==============================================================================
+# This script reads merged, repeated QAOA simulation results for a single,
+# specified problem instance ID. It calculates the normalized "Performance Score"
+# for each repetition and visualizes the score distributions using boxplots
+# for comparative analysis across different problem types (MaxCut, Knapsack, etc.).
+#
+# The Performance Score is calculated as: 1 - ((Actual Cost - Optimal Cost) / (Max Cost - Optimal Cost)).
+# A score of 1.0 indicates finding the exact optimum.
+#
+# Execution Example:
 # python merged_results_plotter_handcrafter.py --simulators IBM_NOISY IBM_NOISY IBM_NOISY IBM_NOISY --depths 1 2 3 4 --plot_type boxplot --instance_id 1
-
-
+# ==============================================================================
 import json
 import os
 import glob
@@ -19,7 +29,17 @@ SUPPLEMENTARY_DATA_DIR = "/Users/kv18799/Github/QAOAstudygit/isingBatches"
 
 
 def preload_supplementary_data():
-    """Loads all exact solutions and Ising models into memory for quick access."""
+    """
+    Loads all exact solutions (optimal/maximum costs) and Ising models
+    (terms and weights) into memory for quick access.
+
+    This data is essential for calculating the normalized performance score
+    without hitting disk repeatedly during the calculation loop.
+
+    Returns:
+        dict: Structured dictionary containing solutions and ising models
+              indexed by problem name and instance ID.
+    """
     print("Pre-loading supplementary data (solutions and Ising models)...")
     preloadedData = {}
     for problemName, problemConfig in problem_configs.items():
@@ -56,7 +76,20 @@ def preload_supplementary_data():
 def calculate_performance_scores(simulatorName, depth, preloadedData, instance):
     """
     Calculates the performance scores for all problem classes for a given
-    simulator, depth and problem instance.
+    simulator, depth, and problem instance ID.
+
+    The score is calculated based on the cost of the most probable bitstring
+    relative to the optimal and maximum costs.
+
+    Args:
+        simulatorName (str): Key from provider_configs (e.g., 'IBM_NOISY').
+        depth (int or None): The QAOA layer depth (p).
+        preloadedData (dict): Dictionary containing exact solutions and Ising models.
+        instance (int): The specific instance ID to analyze.
+
+    Returns:
+        dict: A dictionary where keys are problem names and values are lists
+              of calculated performance scores (one score per repetition).
     """
     performanceScores = {problem: [] for problem in problem_configs.keys()}
 
@@ -94,15 +127,20 @@ def calculate_performance_scores(simulatorName, depth, preloadedData, instance):
         isingWeights = isingModel["weights"]
 
         for repitition in data["results"]:
+            # Repetition metadata, although not used in calculation
             repititionID = repitition["repitition_id"]
 
+            # Get the result bitstring with the highest count
             mostProbableBitstring = repitition["sampled_distribution"][0][0]
-            mostProbableSolution = mostProbableBitstring[::-1]  # Reverse the bitstring
+            # Qiskit returns bitstrings in LSB-first order (reversed), so reverse it
+            mostProbableSolution = mostProbableBitstring[::-1]
 
+            # Calculate the cost of the found solution using the helper function
             mostProbableSolutionCost = calculate_ising_energy(
                 mostProbableSolution, isingTerms, isingWeights
             )
 
+            # Calculate the normalized performance score
             energyRange = maximumCost - optimumCost
             performance = 1 - (
                 (mostProbableSolutionCost - optimumCost) / energyRange
@@ -115,6 +153,9 @@ def calculate_performance_scores(simulatorName, depth, preloadedData, instance):
 
 
 def main():
+    """
+    Main execution function: parses arguments, loads data, calculates scores, and plots results.
+    """
     parser = argparse.ArgumentParser(
         description="Generate comparative plots for QAOA results."
     )
@@ -147,15 +188,18 @@ def main():
 
     args = parser.parse_args()
     simulatorNames = args.simulators
+    # Convert depth argument '-1' to None to handle legacy naming convention
     depths = [None if d == -1 else d for d in args.depths]
     plotType = args.plot_type
     instanceIdToPlot = args.instance_id
 
+    # Validation check
     if len(simulatorNames) != len(depths):
         raise ValueError("The number of simulators must match the number of depths.")
 
     preloadedData = preload_supplementary_data()
     numPairings = len(simulatorNames)
+    # Set up the figure for subplots (one column per simulator/depth pairing)
     fig, axes = plt.subplots(
         1, numPairings, figsize=(6 * numPairings, 7), squeeze=False
     )
@@ -168,23 +212,28 @@ def main():
         )
         yLabel = "Performance Score"
     else:
+        # Placeholder for future plot types
         print(f"Plot type '{plotType}' is not implemented.")
         return
 
+    # Iterate through all required simulator/depth pairs to generate plots
     for i, (simName, depth) in enumerate(zip(simulatorNames, depths)):
         ax = axes[0, i]
         print(f"--- Generating plot for {simName} at depth p={depth or 'default'} ---")
 
         originalLabels = list(problem_configs.keys())
+        # Shorten MinimumVertexCover for cleaner plot labels
         plotLabels = [
             "MVC" if label == "MinimumVertexCover" else label
             for label in originalLabels
         ]
 
+        # Handle title display for depth=None (legacy p=20)
         ax.set_title(f"{simName} (p={depth or '20'})")
         if i == 0:
             ax.set_ylabel(yLabel)
         else:
+            # Hide Y-axis labels on subsequent subplots for clarity
             ax.tick_params(axis="y", labelleft=False)
 
         if plotType == "boxplot":
@@ -192,13 +241,16 @@ def main():
                 simName, depth, preloadedData, instanceIdToPlot
             )
             plotData = [scores[problem] for problem in originalLabels]
+            # Plot only if data was actually found
             if any(len(d) > 0 for d in plotData):
                 ax.boxplot(plotData, labels=plotLabels, patch_artist=True)
+                # Set consistent y-limits for comparison
                 ax.set_ylim(-0.1, 1.1)
                 ax.grid(axis="y", linestyle="--", alpha=0.7)
             else:
                 ax.text(0.5, 0.5, "No data found", ha="center", va="center")
 
+    # Adjust layout to prevent overlap
     fig.subplots_adjust(left=0.05, right=0.95, bottom=0.07, top=0.88, wspace=0.05)
     plt.show()
 

@@ -1,9 +1,26 @@
-import argparse
 import json
-import numpy as np
 import os
 import sys
 import matplotlib.pyplot as plt
+
+# ==============================================================================
+# QPU Time Estimation Analysis Script
+# ==============================================================================
+# This script estimates the total Quantum Processing Unit (QPU) usage required
+# for the study based on simulation data.
+#
+# Since access to actual quantum hardware is time-constrained, this script uses
+# results from "fake_torino" noisy simulations to count the number of optimization
+# loops (iterations) the optimizer required to converge.
+#
+# It applies a constant time factor (avgQPUTimePerLoop = 12s) to these loop
+# counts to estimate the physical runtime.
+#
+# Key outputs:
+# 1. Printed total estimated QPU time (in seconds and minutes).
+# 2. Boxplots showing the distribution of estimated QPU times per problem class
+#    across different QAOA depths (p=1, 2, 3, 4).
+# ==============================================================================
 
 scriptDir = os.path.dirname(os.path.abspath(__file__))
 projectRoot = os.path.abspath(os.path.join(scriptDir, "../../../"))
@@ -11,25 +28,32 @@ if projectRoot not in sys.path:
     sys.path.append(projectRoot)
 
 from config import problem_configs
-from helpers import (
-    load_ising_and_build_hamiltonian,
-    save_single_result,
-    build_mixer_hamiltonian,
-    create_inital_state,
-)
+
 
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
 
-mergedResultsDir = os.path.join(projectRoot, "merged_results_warehouse_test")
+mergedResultsDir = os.path.join(projectRoot, "merged_results_warehouse")
 
+# Constant estimated duration for a single optimization loop on hardware
 avgQPUTimePerLoop = 12  # in seconds, obtained from previous experiments
 
 
 def get_num_optimisation_loops(depth):
     """
-    Calculates the performance scores for all problem classes for a given
-    simulator and depth.
+    Retrieves the number of optimization loops performed for each problem class
+    at a specific QAOA depth.
+
+    It reads the merged JSON result files for the 'fake_torino' backend and
+    extracts the 'num_training_loops' field for every instance.
+
+    Args:
+        depth (int): The QAOA layer depth (p) to analyze.
+
+    Returns:
+        dict: A dictionary where keys are problem names (e.g., 'Knapsack') and
+              values are lists of integers representing the loop counts for
+              each instance of that problem.
     """
     num_loops = {problem: [] for problem in problem_configs.keys()}
 
@@ -60,6 +84,8 @@ def get_num_optimisation_loops(depth):
 
 
 if __name__ == "__main__":
+    # --- Data Collection ---
+    # Collect loop counts for depths 1 through 4
     numLoops = {}
     depths = [1, 2, 3, 4]
     for depth in depths:
@@ -67,6 +93,8 @@ if __name__ == "__main__":
 
     simQPUTimes = {}
 
+    # --- Time Estimation ---
+    # Convert raw loop counts to estimated seconds using the constant factor
     # mulitple every value in numLoops by avgQPUTimePerLoop
     for depth in numLoops:
         simQPUTimes[depth] = {}
@@ -76,7 +104,8 @@ if __name__ == "__main__":
             ]
     # print(simQPUTimes)
 
-    # Summing all QPU times to get total estimated QPU time
+    # --- Totals Calculation ---
+    # Summing all QPU times to get total estimated QPU time per category
     totalEstimatedQPUTimes = {}
     for depth in simQPUTimes:
         totalEstimatedQPUTimes[depth] = {}
@@ -85,6 +114,8 @@ if __name__ == "__main__":
     # print(
     #     "Total Estimated QPU Times (s) per depth and problem:", totalEstimatedQPUTimes
     # )
+
+    # Calculate and print the grand total across all experiments
     totalQPUTime = 0
     for depth in totalEstimatedQPUTimes:
         for problem in totalEstimatedQPUTimes[depth]:
@@ -92,7 +123,8 @@ if __name__ == "__main__":
     print(f"Overall Total Estimated QPU Time (s): {totalQPUTime}")
     print(f"Overall Total Estimated QPU Time (mins): {totalQPUTime / 60}")
 
-    # Plotting
+    # --- Plotting ---
+    # Create a subplot grid (1 row, 4 columns) for each depth
     fig, axes = plt.subplots(
         1, len(depths), figsize=(6 * len(depths), 7), squeeze=False
     )
@@ -103,6 +135,7 @@ if __name__ == "__main__":
     for i in depths:
         ax = axes[0, i - 1]
         originalLabels = list(problem_configs.keys())
+        # Shorten labels for cleaner plotting (MinimumVertexCover -> MVC)
         plotLabels = [
             "MVC" if label == "MinimumVertexCover" else label
             for label in originalLabels
@@ -117,7 +150,7 @@ if __name__ == "__main__":
         plotData = [simQPUTimes[i][problem] for problem in originalLabels]
         if any(len(d) > 0 for d in plotData):
             ax.boxplot(plotData, tick_labels=plotLabels, patch_artist=True)
-            ax.set_ylim(0, 1000)
+            ax.set_ylim(0, 1200)
             ax.grid(axis="y", linestyle="--", alpha=0.7)
         else:
             ax.text(0.5, 0.5, "No data found", ha="center", va="center")

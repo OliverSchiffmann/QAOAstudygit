@@ -1,6 +1,17 @@
+# ==============================================================================
+# D-Wave Quantum Annealing (QA) Execution Script
+# ==============================================================================
+# This script is designed to run a specific Ising model instance using the
+# D-Wave framework, enabling comparison with QAOA results.
+#
+# It supports two primary execution modes via the '--simulator' argument:
+# 1. 'simulatedAnnealing': Uses a local classical sampler (Path Integral Annealing).
+# 2. 'quantumAnnealing': Connects to a remote D-Wave QPU via the DWaveSampler,
+#    using EmbeddingComposite to handle graph mismatches.
+#
+# Execution Example:
 # python anneal_dwave.py --problem_type MaxCut --instance_id 1 --simulator quantumAnnealing
-# script to simulate qunatum annealing on single instance
-# waiting for dwave access to test on real QPU
+# ==============================================================================
 import dimod
 import argparse
 import json
@@ -13,11 +24,17 @@ def setup_configuration():
     """
     Handles script configuration by parsing command-line arguments.
 
+    Parses required arguments: problem_type, instance_id, and simulator.
+    It validates the problem type against `problem_configs` and constructs
+    the filename for the Ising data.
+
     Returns:
         tuple: A tuple containing:
-            - problem_type (str)
+            - problemType (str)
             - instanceOfInterest (int)
-            - isingFileName (str)
+            - isingFileName (str): Path to the Ising data file.
+            - problemFileNameTag (str)
+            - simulator (str): The execution backend identifier.
     """
 
     parser = argparse.ArgumentParser(
@@ -40,7 +57,7 @@ def setup_configuration():
         "--simulator",
         type=str,
         required=True,
-        help="The simulator to use.",
+        help="The simulator to use (e.g., simulatedAnnealing, quantumAnnealing).",
     )
 
     args = parser.parse_args()
@@ -72,7 +89,15 @@ def setup_configuration():
 
 def load_ising_model(file_path, instance_id):
     """
-    Loads Ising terms and weights from a JSON file.
+    Loads the Ising model terms (qubit indices) and weights (coefficients)
+    for the specified instance from a JSON file.
+
+    Args:
+        file_path (str): Path to the JSON file containing all Ising models.
+        instance_id (int): The unique ID of the problem instance to load.
+
+    Returns:
+        tuple: (terms [list of indices], weights [list of coefficients]).
     """
 
     with open(file_path, "r") as f:
@@ -98,7 +123,16 @@ def load_ising_model(file_path, instance_id):
 
 def create_binary_quadratic_model(terms, weights):
     """
-    Creates a Dimod BinaryQuadraticModel from Ising terms and weights.
+    Creates a Dimod BinaryQuadraticModel (BQM) from the raw Ising terms and weights.
+
+    The BQM uses the 'SPIN' variable type required for Ising models in D-Wave.
+
+    Args:
+        terms (list): List of qubit indices (single for linear, pair for quadratic).
+        weights (list): Corresponding coefficients.
+
+    Returns:
+        dimod.BinaryQuadraticModel: The BQM ready for sampling.
     """
 
     bqm = dimod.BinaryQuadraticModel(
@@ -106,9 +140,9 @@ def create_binary_quadratic_model(terms, weights):
     )  # ising mdoels so need spin var type, ignore constant
 
     for term_indices, weight in zip(terms, weights):
-        if len(term_indices) == 1:  # Linear term
+        if len(term_indices) == 1:  # Linear term (h_i * s_i)
             bqm.add_variable(term_indices[0], weight)
-        elif len(term_indices) == 2:  # Quadratic term
+        elif len(term_indices) == 2:  # Quadratic term (J_ij * s_i * s_j)
             bqm.add_interaction(term_indices[0], term_indices[1], weight)
 
     return bqm
@@ -128,17 +162,24 @@ if __name__ == "__main__":
         backend_identifier,
     ) = setup_configuration()
 
+    # --- Sampler Selection ---
     if backend_identifier == "simulatedAnnealing":
+        # Use a classical sampler (Path Integral) for local simulation
         sampler = PathIntegralAnnealingSampler()
+        print("Using PathIntegralAnnealingSampler (Simulated)")
     elif backend_identifier == "quantumAnnealing":
+        # Connect to D-Wave QPU and use EmbeddingComposite for automatic minor embedding
         sampler = EmbeddingComposite(DWaveSampler())
+        print("Using DWaveSampler via EmbeddingComposite (Quantum Annealing)")
     else:
         raise ValueError(f"Unknown backend identifier: {backend_identifier}")
 
+    # --- Model Preparation ---
     terms, weights = load_ising_model(isingFileName, instanceOfInterest)
-
     bqm = create_binary_quadratic_model(terms, weights)
 
+    # --- Execution ---
     sampleset = sampler.sample(bqm)
 
+    # --- Output ---
     print(sampleset)
