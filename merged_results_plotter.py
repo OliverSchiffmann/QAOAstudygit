@@ -14,6 +14,7 @@
 # Example Usage:
 # python merged_results_plotter.py --simulators IBM_IDEAL IBM_IDEAL IBM_IDEAL IBM_IDEAL IBM_IDEAL --depths 1 2 3 4 20 --plot_type boxplot
 # python merged_results_plotter.py --simulators IBM_IDEAL IBM_NOISY IONQ_IDEAL IONQ_NOISY --depths 4 4 4 4 --plot_type barchart
+# python merged_results_plotter.py --simulators IBM_NOISY IBM_NOISY IBM_NOISY IBM_NOISY --depths 1 2 3 4 --plot_type barchart
 # ==============================================================================
 import json
 import os
@@ -26,6 +27,7 @@ from helpers import calculate_ising_energy
 
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
+plt.rcParams["font.size"] = 14
 
 MERGED_RESULTS_DIR = "merged_results_warehouse"
 SUPPLEMENTARY_DATA_DIR = "isingBatches"
@@ -261,10 +263,10 @@ def main():
 
     # --- Set titles and labels based on plot type ---
     if plotType == "boxplot":
-        fig.suptitle("QAOA Performance Distribution by Problem Class", fontsize=16)
+        # fig.suptitle("QAOA Performance Distribution by Problem Class", fontsize=16)
         yLabel = "Performance Score"
     else:  # barchart
-        fig.suptitle("QAOA Success Count by Problem Class", fontsize=16)
+        # fig.suptitle("QAOA Success Count by Problem Class", fontsize=16)
         yLabel = "Optimal Solutions Found"
 
     # Iterate through all required simulator/depth pairs to generate plots

@@ -32,6 +32,7 @@ from config import problem_configs
 
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
+plt.rcParams["font.size"] = 14
 
 mergedResultsDir = os.path.join(projectRoot, "merged_results_warehouse")
 
@@ -129,7 +130,7 @@ if __name__ == "__main__":
         1, len(depths), figsize=(6 * len(depths), 7), squeeze=False
     )
 
-    fig.suptitle("Estimated QPU Time Using Fake Torino", fontsize=16)
+    # fig.suptitle("Estimated QPU Time Using Fake Torino", fontsize=16)
     yLabel = "Estimated QPU Time / s"
 
     for i in depths:

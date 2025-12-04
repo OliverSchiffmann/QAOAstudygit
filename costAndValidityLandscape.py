@@ -23,6 +23,7 @@ from helpers import calculate_ising_energy
 
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
+plt.rcParams["font.size"] = 14
 
 
 def generate_tsp_problem(cities):
@@ -297,7 +298,7 @@ def plotSolutionData(allSolutionData, highlightBitstrings, plotType="scatter"):
         return
 
     fig, ax = plt.subplots(figsize=(4 * numProblems, 7))
-    fig.suptitle("Performance Score Distribution of All $2^N$ Solutions", fontsize=16)
+    # fig.suptitle("Performance Score Distribution of All $2^N$ Solutions", fontsize=16)
 
     plotLabels = []
 

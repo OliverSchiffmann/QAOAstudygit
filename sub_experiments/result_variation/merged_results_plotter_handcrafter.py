@@ -23,6 +23,7 @@ from helpers import calculate_ising_energy
 
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
+plt.rcParams["font.size"] = 14
 
 MERGED_RESULTS_DIR = "merged_repeat_instance_results"
 SUPPLEMENTARY_DATA_DIR = "/Users/kv18799/Github/QAOAstudygit/isingBatches"
@@ -206,10 +207,10 @@ def main():
 
     # --- Set titles and labels based on plot type ---
     if plotType == "boxplot":
-        fig.suptitle(
-            f"Result Variability for Single Instance (ID = {instanceIdToPlot})",
-            fontsize=16,
-        )
+        # fig.suptitle(
+        #     f"Result Variability for Single Instance (ID = {instanceIdToPlot})",
+        #     fontsize=16,
+        # )
         yLabel = "Performance Score"
     else:
         # Placeholder for future plot types
