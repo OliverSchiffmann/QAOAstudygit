@@ -110,7 +110,7 @@ if __name__ == "__main__":
     # Summing all QPU times to get total estimated QPU time per category
     totalEstimatedQPUTimes = {}
     for depth in simQPUTimes:
-        print(f"Simulated QPU times for depth({depth}): {simQPUTimes[depth]}")
+        print(f"Simulated QPU times (s) for depth({depth}): {simQPUTimes[depth]}")
         totalEstimatedQPUTimes[depth] = {}
         for problem in simQPUTimes[depth]:
             totalEstimatedQPUTimes[depth][problem] = sum(simQPUTimes[depth][problem])
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     totalQPUTime = 0
     for depth in totalEstimatedQPUTimes:
         print(
-            f"total estimated qpu times for depth({depth}): {totalEstimatedQPUTimes[depth]}"
+            f"total estimated qpu times (s) for depth({depth}): {totalEstimatedQPUTimes[depth]}"
         )
         for problem in totalEstimatedQPUTimes[depth]:
             totalQPUTime += totalEstimatedQPUTimes[depth][problem]

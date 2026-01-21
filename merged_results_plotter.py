@@ -274,6 +274,7 @@ def main():
         ax = axes[0, i]
         print(f"--- Generating plot for {simName} at depth p={depth or 'default'} ---")
 
+        providerColour = provider_configs[simName]["colour"]
         originalLabels = list(problem_configs.keys())
         # Shorten MinimumVertexCover for cleaner plot labels
         plotLabels = [
@@ -295,7 +296,12 @@ def main():
             plotData = [scores[problem] for problem in originalLabels]
             # Plot only if data was actually found
             if any(len(d) > 0 for d in plotData):
-                ax.boxplot(plotData, labels=plotLabels, patch_artist=True)
+                ax.boxplot(
+                    plotData,
+                    labels=plotLabels,
+                    patch_artist=True,
+                    boxprops=dict(facecolor=providerColour),
+                )
                 # Set consistent y-limits for comparison (0 to 1, plus buffer)
                 ax.set_ylim(-0.1, 1.1)
                 ax.grid(axis="y", linestyle="--", alpha=0.7)
@@ -307,7 +313,7 @@ def main():
             plotData = [counts[problem] for problem in originalLabels]
             if sum(plotData) > 0:
                 # Generate bars
-                bars = ax.bar(plotLabels, plotData)
+                bars = ax.bar(plotLabels, plotData, color=providerColour)
                 # Set y-limit slightly above 100 since there are 100 instances
                 ax.set_ylim(0, 105)
                 ax.grid(axis="y", linestyle="--", alpha=0.7)
