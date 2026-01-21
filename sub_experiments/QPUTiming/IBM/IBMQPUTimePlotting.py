@@ -32,7 +32,7 @@ from config import problem_configs
 
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
-plt.rcParams["font.size"] = 14
+plt.rcParams["font.size"] = 18
 
 mergedResultsDir = os.path.join(projectRoot, "merged_results_warehouse")
 
@@ -147,7 +147,7 @@ if __name__ == "__main__":
             for label in originalLabels
         ]
 
-        ax.set_title(f"(p={i})")
+        ax.set_title(f"(p={i})", fontsize=18)
         if i == 1:
             ax.set_ylabel(yLabel)
         else:
@@ -165,6 +165,8 @@ if __name__ == "__main__":
             ax.grid(axis="y", linestyle="--", alpha=0.7)
         else:
             ax.text(0.5, 0.5, "No data found", ha="center", va="center")
+
+        ax.set_xticklabels(plotLabels, rotation=-45, ha="left")
 
     fig.subplots_adjust(left=0.05, right=0.95, bottom=0.07, top=0.88, wspace=0.05)
     plt.show()

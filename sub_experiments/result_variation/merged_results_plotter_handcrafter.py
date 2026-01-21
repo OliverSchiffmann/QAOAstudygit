@@ -23,7 +23,7 @@ from helpers import calculate_ising_energy
 
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
-plt.rcParams["font.size"] = 14
+plt.rcParams["font.size"] = 18
 
 MERGED_RESULTS_DIR = "merged_repeat_instance_results"
 SUPPLEMENTARY_DATA_DIR = "/Users/kv18799/Github/QAOAstudygit/isingBatches"
@@ -231,7 +231,7 @@ def main():
         ]
 
         # Handle title display for depth=None (legacy p=20)
-        ax.set_title(f"{simName} (p={depth or '20'})")
+        ax.set_title(f"{simName} (p={depth or '20'})", fontsize=18)
         if i == 0:
             ax.set_ylabel(yLabel)
         else:
@@ -256,6 +256,8 @@ def main():
                 ax.grid(axis="y", linestyle="--", alpha=0.7)
             else:
                 ax.text(0.5, 0.5, "No data found", ha="center", va="center")
+
+        ax.set_xticklabels(plotLabels, rotation=-45, ha="left")
 
     # Adjust layout to prevent overlap
     fig.subplots_adjust(left=0.05, right=0.95, bottom=0.07, top=0.88, wspace=0.05)

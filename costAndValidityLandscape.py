@@ -23,7 +23,7 @@ from helpers import calculate_ising_energy
 
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
-plt.rcParams["font.size"] = 14
+plt.rcParams["font.size"] = 18
 
 
 def generate_tsp_problem(cities):
