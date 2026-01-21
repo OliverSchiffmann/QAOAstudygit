@@ -155,7 +155,12 @@ if __name__ == "__main__":
 
         plotData = [simQPUTimes[i][problem] for problem in originalLabels]
         if any(len(d) > 0 for d in plotData):
-            ax.boxplot(plotData, tick_labels=plotLabels, patch_artist=True)
+            ax.boxplot(
+                plotData,
+                tick_labels=plotLabels,
+                patch_artist=True,
+                boxprops=dict(facecolor="royalblue"),
+            )
             ax.set_ylim(0, 1200)
             ax.grid(axis="y", linestyle="--", alpha=0.7)
         else:
