@@ -160,6 +160,7 @@ if __name__ == "__main__":
                 tick_labels=plotLabels,
                 patch_artist=True,
                 boxprops=dict(facecolor="royalblue"),
+                medianprops=dict(color="red", linewidth=1.5),
             )
             ax.set_ylim(0, 1200)
             ax.grid(axis="y", linestyle="--", alpha=0.7)
@@ -168,5 +169,5 @@ if __name__ == "__main__":
 
         ax.set_xticklabels(plotLabels, rotation=-45, ha="left")
 
-    fig.subplots_adjust(left=0.05, right=0.95, bottom=0.07, top=0.88, wspace=0.05)
+    fig.subplots_adjust(left=0.08, right=0.95, bottom=0.15, top=0.88, wspace=0.05)
     plt.show()

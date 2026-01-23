@@ -13,8 +13,12 @@
 #
 # Example Usage:
 # python merged_results_plotter.py --simulators IBM_IDEAL IBM_IDEAL IBM_IDEAL IBM_IDEAL IBM_IDEAL --depths 1 2 3 4 20 --plot_type boxplot
-# python merged_results_plotter.py --simulators IBM_IDEAL IBM_NOISY IONQ_IDEAL IONQ_NOISY --depths 4 4 4 4 --plot_type barchart
 # python merged_results_plotter.py --simulators IBM_NOISY IBM_NOISY IBM_NOISY IBM_NOISY --depths 1 2 3 4 --plot_type barchart
+# python merged_results_plotter.py --simulators IONQ_IDEAL IONQ_IDEAL IONQ_IDEAL IONQ_IDEAL IONQ_IDEAL --depths 1 2 3 4 20 --plot_type boxplot
+# python merged_results_plotter.py --simulators IONQ_NOISY IONQ_NOISY IONQ_NOISY IONQ_NOISY --depths 1 2 3 4 --plot_type boxplot
+# python merged_results_plotter.py --simulators IBM_IDEAL IBM_NOISY IONQ_IDEAL IONQ_NOISY ALICEBOB --depths 4 4 4 4 4 --plot_type barchart
+# python merged_results_plotter.py --simulators IBM_IDEAL IBM_NOISY IONQ_IDEAL IONQ_NOISY ALICEBOB --depths 4 4 4 4 4 --plot_type boxplot
+
 # ==============================================================================
 import json
 import os
@@ -301,6 +305,7 @@ def main():
                     labels=plotLabels,
                     patch_artist=True,
                     boxprops=dict(facecolor=providerColour),
+                    medianprops=dict(color="red", linewidth=1.5),
                 )
                 # Set consistent y-limits for comparison (0 to 1, plus buffer)
                 ax.set_ylim(-0.1, 1.1)
@@ -325,7 +330,7 @@ def main():
         ax.set_xticklabels(plotLabels, rotation=-45, ha="left")
 
     # Adjust layout to prevent overlap
-    fig.subplots_adjust(left=0.05, right=0.95, bottom=0.15, top=0.88, wspace=0.05)
+    fig.subplots_adjust(left=0.07, right=0.95, bottom=0.15, top=0.88, wspace=0.05)
     plt.show()
 
 

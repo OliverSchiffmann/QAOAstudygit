@@ -250,6 +250,7 @@ def main():
                     labels=plotLabels,
                     patch_artist=True,
                     boxprops=dict(facecolor=providerColour),
+                    medianprops=dict(color="red", linewidth=1.5),
                 )
                 # Set consistent y-limits for comparison
                 ax.set_ylim(-0.1, 1.1)
@@ -260,7 +261,7 @@ def main():
         ax.set_xticklabels(plotLabels, rotation=-45, ha="left")
 
     # Adjust layout to prevent overlap
-    fig.subplots_adjust(left=0.05, right=0.95, bottom=0.07, top=0.88, wspace=0.05)
+    fig.subplots_adjust(left=0.07, right=0.95, bottom=0.15, top=0.88, wspace=0.05)
     plt.show()
 
 
