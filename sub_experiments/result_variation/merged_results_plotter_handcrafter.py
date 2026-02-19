@@ -10,6 +10,7 @@
 # A score of 1.0 indicates finding the exact optimum.
 #
 # Execution Example:
+# python merged_results_plotter_handcrafter.py --simulators IBM_IDEAL IBM_IDEAL IBM_IDEAL IBM_IDEAL IBM_IDEAL --depths 1 2 3 4 20 --plot_type boxplot --instance_id 1
 # python merged_results_plotter_handcrafter.py --simulators IBM_NOISY IBM_NOISY IBM_NOISY IBM_NOISY --depths 1 2 3 4 --plot_type boxplot --instance_id 1
 # ==============================================================================
 import json

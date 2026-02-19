@@ -173,12 +173,3 @@ python merged_results_plotter.py \
     --plot_type barchart
 
 
-Citation
-
-If you use this code in your research, please cite:
-
-[Placeholder for Citation / BibTeX]
-
-License
-
-[Placeholder for License, e.g., MIT]
