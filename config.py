@@ -10,12 +10,12 @@ problem_configs = {
 
 
 provider_configs = {
-    "IONQ_IDEAL": {"file_slug": "ionq_simulator_", "colour": "lightgreen"},
     "IBM_IDEAL": {"file_slug": "aer_simulator_", "colour": "lightsteelblue"},
-    "IONQ_NOISY": {"file_slug": "aria-1_", "colour": "seagreen"},
     "IBM_NOISY": {
         "file_slug": "aer_simulator_from(fake_torino)_",
         "colour": "royalblue",
     },
+    "IONQ_IDEAL": {"file_slug": "ionq_simulator_", "colour": "lightgreen"},
+    "IONQ_NOISY": {"file_slug": "aria-1_", "colour": "seagreen"},
     "ALICEBOB": {"file_slug": "EMU:15Q:LOGICAL_EARLY_", "colour": "moccasin"},
 }

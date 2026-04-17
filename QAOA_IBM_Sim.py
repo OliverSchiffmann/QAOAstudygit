@@ -19,6 +19,7 @@ import argparse
 import numpy as np
 from scipy.optimize import minimize
 from config import problem_configs
+import matplotlib.pyplot as plt
 from helpers import (
     load_ising_and_build_hamiltonian,
     save_single_result,
@@ -33,6 +34,7 @@ from qiskit_ibm_runtime import (
     EstimatorV2 as Estimator,
     SamplerV2 as Sampler,
 )
+from qiskit import QuantumCircuit
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
 from qiskit_ibm_runtime.fake_provider import (
     FakeTorino,
@@ -177,6 +179,7 @@ if __name__ == "__main__":
     if backend_identifier == "IDEAL":
         backend_simulator = AerSimulator()
         print(f"Backend: {backend_simulator.name}")
+        print(f"{backend_simulator._SIMULATION_METHODS}")
     elif backend_identifier == "NOISY":
         # Use AerSimulator initialized with the noise model of a real device (FakeTorino)
         backend_simulator = AerSimulator.from_backend(FakeTorino())
@@ -201,6 +204,7 @@ if __name__ == "__main__":
         print(f"Capacity of this knapsack is: {weightCapacity}")
 
     print(f"Quadratic and linear terms of the Ising model are: {isingTerms}")
+    print(costHamil)
 
     # --- mixer ---
     # Build the Mixer Hamiltonian (H_M)
@@ -226,6 +230,9 @@ if __name__ == "__main__":
     # Transpile the circuit for the selected simulator
     pm = generate_preset_pass_manager(optimization_level=3, backend=backend_simulator)
     candidate_circuit = pm.run(circuit)
+    # print(candidate_circuit)
+    fig = candidate_circuit.decompose().draw(output="mpl")
+    plt.show()
 
     # linear ramp schedule
     # Define the initial parameter guess (linear ramp initialization)
