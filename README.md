@@ -14,7 +14,7 @@ Exact solving of instances to establish ground truth (global optima).
 
 Execution of QAOA circuits on IBM, IonQ, and Alice & Bob providers.
 
-Benchmarking against classical and quantum annealing (D-Wave).
+Benchmarking against classical and simulated quantum annealing (D-Wave).
 
 Analysis of solution landscapes and HPC resource consumption.
 
