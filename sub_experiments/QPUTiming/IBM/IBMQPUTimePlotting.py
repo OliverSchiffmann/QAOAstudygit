@@ -29,7 +29,6 @@ if projectRoot not in sys.path:
 
 from config import problem_configs
 
-
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
 plt.rcParams["font.size"] = 18
@@ -128,6 +127,34 @@ if __name__ == "__main__":
             totalQPUTime += totalEstimatedQPUTimes[depth][problem]
     print(f"Overall Total Estimated QPU Time (s): {totalQPUTime}")
     print(f"Overall Total Estimated QPU Time (mins): {totalQPUTime / 60}")
+
+    # --- Mean Cost Analysis ---
+    # Calculate the mean QPU time (s) per problem per depth, then convert to cost
+    costPerMinute = 48  # USD per QPU minute
+
+    print("\n" + "=" * 70)
+    print("MEAN QPU TIME & ESTIMATED TRAINING COST (Cost Rate: $48/QPU min)")
+    print("=" * 70)
+
+    for depth in depths:
+        print(f"\n  Depth p={depth}:")
+        print(
+            f"  {'Problem':<30} {'Mean QPU Time (s)':>20} {'Mean QPU Time (min)':>22} {'Cost ($)':>12}"
+        )
+        print(f"  {'-'*30} {'-'*20} {'-'*22} {'-'*12}")
+        for problem in simQPUTimes[depth]:
+            data = simQPUTimes[depth][problem]
+            if not data:
+                print(f"  {problem:<30} {'N/A':>20} {'N/A':>22} {'N/A':>12}")
+                continue
+            meanTime = sum(data) / len(data)  # mean in seconds
+            meanTimeMins = meanTime / 60
+            meanCost = meanTimeMins * costPerMinute
+            print(
+                f"  {problem:<30} {meanTime:>20.2f} {meanTimeMins:>22.4f} {meanCost:>12.4f}"
+            )
+
+    print("\n" + "=" * 70 + "\n")
 
     # --- Plotting ---
     # Create a subplot grid (1 row, 4 columns) for each depth
