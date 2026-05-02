@@ -231,8 +231,9 @@ if __name__ == "__main__":
     pm = generate_preset_pass_manager(optimization_level=3, backend=backend_simulator)
     candidate_circuit = pm.run(circuit)
     # print(candidate_circuit)
-    fig = candidate_circuit.decompose().draw(output="mpl")
-    plt.show()
+    # fig = candidate_circuit.decompose().draw(output="mpl")
+    # print(f"Depth of circuit: {candidate_circuit.depth()}")
+    # plt.show()
 
     # linear ramp schedule
     # Define the initial parameter guess (linear ramp initialization)
