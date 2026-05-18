@@ -154,6 +154,24 @@ def calculate_performance_scores(simulatorName, depth, preloadedData, instance):
     return performanceScores
 
 
+def print_variability_stats(scores, simName, depth):
+    print(f"\n--- Variability Stats: {simName}, depth p={depth or 20} ---")
+    print(f"{'Problem':<25} {'IQR':>8} {'Range':>8} {'Min':>8} {'Max':>8}")
+    print(f"{'-'*25} {'-'*8} {'-'*8} {'-'*8} {'-'*8}")
+    maxIQR = 0
+    for problemName, scoreList in scores.items():
+        if scoreList:
+            arr = np.array(scoreList)
+            iqr = np.percentile(arr, 75) - np.percentile(arr, 25)
+            rng = arr.max() - arr.min()
+            maxIQR = max(maxIQR, iqr)
+            print(
+                f"{problemName:<25} {iqr:>8.4f} {rng:>8.4f} "
+                f"{arr.min():>8.4f} {arr.max():>8.4f}"
+            )
+    print(f"\n  Maximum IQR across all problems: {maxIQR:.4f}")
+
+
 def main():
     """
     Main execution function: parses arguments, loads data, calculates scores, and plots results.
@@ -243,6 +261,7 @@ def main():
             scores = calculate_performance_scores(
                 simName, depth, preloadedData, instanceIdToPlot
             )
+            print_variability_stats(scores, simName, depth)
             plotData = [scores[problem] for problem in originalLabels]
             # Plot only if data was actually found
             if any(len(d) > 0 for d in plotData):

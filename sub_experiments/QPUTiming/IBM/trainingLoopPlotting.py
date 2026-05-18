@@ -4,7 +4,6 @@ import sys
 import matplotlib.pyplot as plt
 from collections import defaultdict
 
-
 scriptDir = os.path.dirname(os.path.abspath(__file__))
 projectRoot = os.path.abspath(os.path.join(scriptDir, "../../../"))
 if projectRoot not in sys.path:
@@ -174,4 +173,68 @@ if __name__ == "__main__":
                 ax.text(0.5, 0.5, "No data found", ha="center", va="center")
 
     fig.subplots_adjust(left=0.07, right=0.95, bottom=0.11, top=0.965, wspace=0.05)
+    # --- Factor of Increase in Training Loops: Depth 1 to Depth 4 ---
+    allLoopsDepth1 = []
+    allLoopsDepth4 = []
+
+    for providerName, providerConfig in provider_configs.items():
+        providerFileSlug = providerConfig["file_slug"]
+        for problem in problem_configs.keys():
+            allLoopsDepth1.extend(numLoops[1][providerFileSlug][problem])
+            allLoopsDepth4.extend(numLoops[4][providerFileSlug][problem])
+
+    meanDepth1 = sum(allLoopsDepth1) / len(allLoopsDepth1) if allLoopsDepth1 else 0
+    meanDepth4 = sum(allLoopsDepth4) / len(allLoopsDepth4) if allLoopsDepth4 else 0
+    factor = meanDepth4 / meanDepth1 if meanDepth1 > 0 else 0
+
+    print("\n" + "=" * 60)
+    print("TRAINING LOOP FACTOR OF INCREASE: DEPTH 1 -> DEPTH 4")
+    print("=" * 60)
+    print(f"  Mean training loops at depth p=1: {meanDepth1:.2f}")
+    print(f"  Mean training loops at depth p=4: {meanDepth4:.2f}")
+    print(f"  Factor of increase (p=4 / p=1):   {factor:.2f}x")
+    print("=" * 60 + "\n")
+
+    # --- IBM/IonQ vs Alice & Bob Training Loop Comparison ---
+    ibmIonqProviders = {"IBM_IDEAL", "IBM_NOISY", "IONQ_IDEAL", "IONQ_NOISY"}
+    aliceBobProviders = {"ALICEBOB"}
+
+    ibmIonqLoops = {depth: [] for depth in depths}
+    aliceBobLoops = {depth: [] for depth in depths}
+
+    for providerName, providerConfig in provider_configs.items():
+        providerFileSlug = providerConfig["file_slug"]
+        for depth in depths:
+            for problem in problem_configs.keys():
+                loops = numLoops[depth][providerFileSlug][problem]
+                if providerName in ibmIonqProviders:
+                    ibmIonqLoops[depth].extend(loops)
+                elif providerName in aliceBobProviders:
+                    aliceBobLoops[depth].extend(loops)
+
+    print("=" * 60)
+    print("IBM/IONQ vs ALICE & BOB: MEAN TRAINING LOOPS PER DEPTH")
+    print("=" * 60)
+    print(
+        f"  {'Depth':<10} {'IBM/IonQ Mean':>15} {'Alice&Bob Mean':>15} {'Difference':>12} {'% Reduction':>12}"
+    )
+    print(f"  {'-'*10} {'-'*15} {'-'*15} {'-'*12} {'-'*12}")
+    for depth in depths:
+        ibmIonqMean = (
+            sum(ibmIonqLoops[depth]) / len(ibmIonqLoops[depth])
+            if ibmIonqLoops[depth]
+            else 0
+        )
+        aliceBobMean = (
+            sum(aliceBobLoops[depth]) / len(aliceBobLoops[depth])
+            if aliceBobLoops[depth]
+            else 0
+        )
+        difference = ibmIonqMean - aliceBobMean
+        pctReduction = (difference / ibmIonqMean * 100) if ibmIonqMean > 0 else 0
+        print(
+            f"  {f'p={depth}':<10} {ibmIonqMean:>15.2f} {aliceBobMean:>15.2f} {difference:>12.2f} {pctReduction:>11.1f}%"
+        )
+    print("=" * 60 + "\n")
+
     plt.show()

@@ -232,7 +232,7 @@ if __name__ == "__main__":
     candidate_circuit = pm.run(circuit)
     # print(candidate_circuit)
     # fig = candidate_circuit.decompose().draw(output="mpl")
-    # print(f"Depth of circuit: {candidate_circuit.depth()}")
+    print(f"Depth of circuit: {candidate_circuit.depth()}")
     # plt.show()
 
     # linear ramp schedule
